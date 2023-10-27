@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="./assets/fontawesome/js/all.min.js"></script>
+    <style>
+        body {
+            /* font-family: 'Times New Roman', Times, serif; */
+        }
+        p {
+            font-family: sans-serif;
+        }
+        .grid {
+            display: flex;
+            flex-wrap: wrap;
+            /* width: 100%; */
+        }
+        
+        #aboutButton {
+            position: relative;
+            overflow: hidden;
+            transition: .3s linear;
+            text-transform: uppercase;
+        }
+        #aboutButton::before {
+            content: " ";
+            width: 100%;
+            height: 100%;
+            background-color: #212529;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            transition: .3s linear;
+            transform: translateX(-100%);
+            z-index: -1;
+        }
+        #aboutButton:hover {
+            color: #f1f1f1;
+        }
+        #aboutButton:hover::before {
+            transform: translateX(0%);
+        }
+        .font-newroman {
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .logo {
+            width: 70px;
+        }
+        #mobileNavbar {
+            transform: translateX(100%);
+            transition: all 500ms ease;
+        }
+        #mobileNavbar.opened {
+            transform: translateX(0) !important;
+        }
+        .project-card {
+            transition: all .4s ease;
+            opacity: 0;
+            transform: translateY(40%);
+        }
+        .project-card.show {
+            opacity: 1;
+            transform: translateY(0%);
+        }
+        @keyframes scaleup {
+            from {
+                transform: scale(0.5);
+            } to {
+                transform: scale(1);
+            }
+        }
+        .nav-link {
+            transition: all .4s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            opacity: .5;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid overflow-hidden">
+        
+        <div class="row align-items-start ">
+            <aside class="col-2 left-0 top-0 d-none d-md-flex flex-column align-items-center justify-content-center h-auto" style="padding-top: 150px;">
+                <ul class="list-unstyled mt-3 text-dark">
+                    <li><a href="./index.html" class="nav-link mb-4 fw-bold text-uppercase"><span class="small">Home</span></a></li>
+                    <li><a href="./about.html" class="nav-link mb-4 fw-bold text-uppercase"><span class="small">about</span></a></li>
+                    <li><a href="./contact.html" class="nav-link mb-4 fw-bold text-uppercase"><span class="small">contact</span></a></li>
+                    <li><a href="./gallery.html" class="nav-link mb-4 fw-bold text-uppercase active"><span class="small">works</span></a></li>
+                </ul>
+                <div class="nav-brand logo d-flex justify-content-center align-items-center bg-dark text-light font-newroman mt-5" style="aspect-ratio: 1/1;"><h1 class="m-0 display-4">F</h1></div>
+                <div class="font-newroman small">Fern's Project</div>
+            </aside>
+            <nav class="navbar navbar-expand-lg mb-3 d-block d-md-none">
+                <div class="container">
+                    <div class="nav-brand logo d-flex justify-content-center align-items-center bg-dark text-light font-newroman" style="aspect-ratio: 1/1;"><h1 class="m-0 display-4">F</h1></div>
+                    <ul class="navbar nav ms-auto">
+                        <li class="nav-item"><button class="nav-link text-dark fs-1" id="openButton"><i class="fas fa-bars"></i></button></li>
+                    </ul>
+                </div>
+            </nav>
+            <aside class="vh-100 position-fixed bg-dark col-4 end-0 top-0 d-block d-md-none" style="padding-top: 150px;z-index: 20;" id="mobileNavbar">
+                
+                <ul class="list-unstyled">
+                    <li class="text-center mb-4"><a href="./index.html" class="text-light text-decoration-none text-uppercase small fw-semibold">Home</a></li>
+                    <li class="text-center mb-4"><a href="./about.html" class="text-light text-decoration-none text-uppercase small fw-semibold">About</a></li>
+                    <li class="text-center mb-4"><a href="./contact.html" class="text-light text-decoration-none text-uppercase small fw-semibold">Contact</a></li>
+                    <li class="text-center mb-4"><a href="./gallery.html" class="text-light text-decoration-none text-uppercase small fw-semibold">Works</a></li>
+                </ul>
+                <button id="closeButton" class="btn text-light p-0 w-100 d-inline text-center"><i class="fas fa-x"></i></button>
+            </aside>
+            <main class="col-12 col-md-9" style="padding-top: 120px;">
+                <h2 class="text-center font-newroman mb-3">My Works</h2>
+                <div class="row" id="projects">
+                    <div class="col-12 col-md-6 mb-4 h-auto project-card">
+                        <div class="card border-0 rounded-0 shadow-sm h-100" style="height: fit-content;">
+                            <img src="./assets/img/projects/cassar.png" alt="" class="img-card-top">
+                            <div class="card-body p-4">
+                                <div class="card-title fw-bold fs-4">Cassar</div>
+                                <p class="card-text small">Program JavaScript yang mampu menebak kartu yang dipilih oleh user</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 mb-4 h-auto project-card">
+                        <div class="card border-0 rounded-0 shadow-sm h-100">
+                            <img src="./assets/img/projects/ruliportfolio.png" alt="" class="img-card-top">
+                            <div class="card-body">
+                                <div class="card-title fw-bold fs-4">Ruli Kurniawan Portfolio</div>
+                                <p class="card-text small">Website personal designer grafis vector art</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 mb-4 h-auto project-card">
+                        <div class="card border-0 rounded-0 shadow-sm h-100">
+                            <img src="./assets/img/projects/furniture.png" alt="" class="img-card-top">
+                            <div class="card-body">
+                                <div class="card-title fw-bold fs-4">Furniture Landing Page</div>
+                                <p class="card-text small">Landing page website penjualan furniture kayu</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-6 mb-4 h-auto project-card">
+                        <div class="card border-0 rounded-0 shadow-sm h-100" style="height: fit-content;">
+                            <img src="./assets/img/projects/projectile.png" alt="" class="img-card-top">
+                            <div class="card-body p-4">
+                                <div class="card-title fw-bold fs-4">Projectile Motion Program</div>
+                                <p class="card-text small">Program JavaScript yang mampu menghitung jalur, jarak, ketinggian dan waktu dari gerak kinematika</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </main>
+        </div>
+    </div>
+    
+</body>
+<script src="./assets/js/script.js"></script>
+<script>
+        const projectContainer = document.getElementById('projects')
+        let projectCard = document.getElementsByClassName('project-card')
+        
+    window.addEventListener('scroll', function() {
+        let YPosition = window.scrollY
+        let projectContaineroffsetTop = projectContainer.offsetTop - 1000
+        if(YPosition >= projectContaineroffsetTop ) {
+            for(let i = 0;i < projectCard.length;i++) {
+                setTimeout(function() {
+                    projectCard[i].classList.add('show')
+                }, 300 * i)
+            }
+        }
+    })
+</script>
+</html>

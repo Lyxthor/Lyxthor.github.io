@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="./assets/fontawesome/js/all.min.js"></script>
+    <style>
+        body {
+            /* font-family: 'Times New Roman', Times, serif; */
+        }
+        p {
+            font-family: sans-serif;
+        }
+        .grid {
+            display: flex;
+            flex-wrap: wrap;
+            /* width: 100%; */
+        }
+        .card {
+            aspect-ratio: 1/1;
+        }
+        .card-long {
+            aspect-ratio: 2/1;
+        }
+        .card-tall {
+            aspect-ratio: 2/4;
+        }
+        .font-newroman {
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .logo {
+            width: 70px;
+            aspect-ratio: 1/1;
+        }
+        .about-image {
+            animation: fadesup 1000ms ease-out forwards;
+        }
+        .about-image.mobile {
+            animation: fadesup2 1000ms ease-out forwards;
+        }
+        .page-title {
+            animation: slidedown 1000ms ease forwards;
+        }
+        .content > p {
+            animation: fades 1000ms linear forwards;
+
+        }
+        #mobileNavbar {
+            transform: translateX(100%);
+            transition: all 500ms ease;
+        }
+        #mobileNavbar.opened {
+            transform: translateX(0) !important;
+        }
+        @keyframes scaleup {
+            from {
+                transform: scale(0.5);
+            } to {
+                transform: scale(1);
+            }
+        }
+        @keyframes fadesup {
+            0% {
+                transform: translate(40%, 70%);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(40%, 0%);
+                opacity: 1;
+            }
+        }
+        @keyframes fadesup2 {
+            0% {
+                transform: translate(40%, 70%);
+                opacity: 0;
+            }
+            100% {
+                transform: translate(40%, 5%);
+                opacity: 1;
+            }
+        }
+        @keyframes slidedown {
+            0% {
+                transform: translateY(-70%);
+                opacity: 0.2;
+            }
+            100% {
+                transform: translateY(0%);
+                opacity: 1;
+            }
+        }
+        @keyframes fades {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        .nav-link {
+            transition: all .4s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            opacity: .5;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid overflow-x-hidden">
+        <section class="w-100 d-flex justify-content-center d-block d-md-none position-fixed end-0 bottom-0" > 
+            <img src="./assets/img/hero2.jpg" alt="" class="object-fit-cover position-absolute bottom-0 end-0 about-image mobile" style="width: 100vw;height: 80vh;filter: grayscale(120%) brightness(80%);transform: translateX(40%) translateY(10%)">
+        </section>
+        <div class="row align-items-start vh-100  position-relative overflow-hidden" style="padding-top: 150px;">
+            <aside class="col-2 left-0 top-0 d-none d-md-flex flex-column align-items-center justify-content-center h-auto">
+                <ul class="list-unstyled mt-3 text-dark">
+                    <li><a href="./index.html" class="nav-link mb-4 fw-bold text-uppercase"><span class="small">Home</span></a></li>
+                    <li><a href="./about.html" class="nav-link mb-4 fw-bold text-uppercase active"><span class="small">about</span></a></li>
+                    <li><a href="./contact.html" class="nav-link mb-4 fw-bold text-uppercase"><span class="small">contact</span></a></li>
+                    <li><a href="./gallery.html" class="nav-link mb-4 fw-bold text-uppercase"><span class="small">works</span></a></li>
+                </ul>
+                <div class="nav-brand logo d-flex justify-content-center align-items-center bg-dark text-light font-newroman mt-5" style="aspect-ratio: 1/1;"><h1 class="m-0 display-4">F</h1></div>
+                <div class="font-newroman small">Fern's Project</div>
+            </aside>
+            <nav class="navbar navbar-expand-lg mb-3 d-block d-md-none">
+                <div class="container">
+                    <div class="nav-brand logo d-flex justify-content-center align-items-center bg-dark text-light font-newroman" style="aspect-ratio: 1/1;"><h1 class="m-0 display-4">F</h1></div>
+                    <ul class="navbar nav ms-auto">
+                        <li class="nav-item"><button class="nav-link text-dark fs-1" id="openButton"><i class="fas fa-bars"></i></button></li>
+                    </ul>
+                </div>
+            </nav>
+            <aside class="vh-100 position-fixed bg-dark col-4 end-0 top-0 d-block d-md-none" style="padding-top: 150px;z-index: 20;" id="mobileNavbar">
+                <ul class="list-unstyled">
+                    <li class="text-center mb-4"><a href="./index.html" class="text-light text-decoration-none text-uppercase small fw-semibold">Home</a></li>
+                    <li class="text-center mb-4"><a href="./about.html" class="text-light text-decoration-none text-uppercase small fw-semibold">About</a></li>
+                    <li class="text-center mb-4"><a href="./contact.html" class="text-light text-decoration-none text-uppercase small fw-semibold">Contact</a></li>
+                    <li class="text-center mb-4"><a href="./gallery.html" class="text-light text-decoration-none text-uppercase small fw-semibold">Works</a></li>
+                </ul>
+                <button id="closeButton" class="btn text-light p-0 w-100 d-inline text-center"><i class="fas fa-x"></i></button>
+            </aside>
+            <main class="col-11 col-md-6 position-relative">
+                <div class="row justify-content-end " >
+                    <article class="col-11 font-newroman content">
+                        <h1 class="display-1 text-dark text-uppercase m-0 mb-4 page-title" >About Me</h1>
+                        
+                        <p class="lead fs-6 text-muted fw-light">Hi, I'm Felix, a freelance UI/UX Designer. As a UI/UX designer, I dedicated to crafting user-friendly digital experiences that seamlessly merge beauty and functionality. With a keen eye for detail and a passion for problem-solving, I'm committed to creating designs that captivate and engage users while driving business success. Let's collaborate to transform your digital vision into reality.</p>
+                        <!-- <p class="lead fs-6 text-muted fw-light">Lorem ipsum dolor sit amet consectetur, adipisicing elit. Quae nisi asperiores eveniet beatae iste sed id suscipit! Et ex adipisci, nulla mollitia similique nemo illo fugiat natus illum inventore corporis.</p> -->
+                    </article>
+                    <footer class="col-11 mt-5">
+                        <ul class="list-unstyled fw-bold text-dark small">
+                            <li><a href="mailto:lyxthor22@gmail.com" class="nav-link mb-3">lyxthor22@gmail.com</a></li>
+                            <li><a href="tel:+6285227608900" class="nav-link mb-3">0852-2760-8900</a></li>
+                            <li><a href="https://facebook.com" class="nav-link d-inline mb-3">Facebook</a> | <a href="https://instagram.com" class="nav-link d-inline mb-3">Instagram</a> | <a href="https://twitter.com" class="nav-link d-inline mb-3">Twitter</a></li>
+                        </ul>
+
+
+                    </footer>
+                </div>
+            </main>
+            <section class="col-4 d-flex justify-content-center d-none d-md-block" >
+                
+                    <img src="./assets/img/hero2.jpg" alt="" class="object-fit-cover position-absolute bottom-0 end-0 about-image" style="width: 40%;height: 100vh;filter: grayscale(120%) brightness(80%);transform: translateX(40%)" >
+               
+                
+                
+            </section>
+            
+        </div>
+    </div>
+    
+</body>
+<script src="./assets/js/script.js"></script>
+
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="./node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/fontawesome/css/all.min.css">
+    <script src="./node_modules/bootstrap/dist/js/bootstrap.bundle.js"></script>
+    <script src="./assets/fontawesome/js/all.min.js"></script>
+    <style>
+        body {
+            /* font-family: 'Times New Roman', Times, serif; */
+        }
+        p {
+            font-family: sans-serif;
+        }
+        .grid {
+            display: flex;
+            flex-wrap: wrap;
+            /* width: 100%; */
+        }
+        .card {
+            aspect-ratio: 1/1;
+        }
+        .card-long {
+            aspect-ratio: 2/1;
+        }
+        .card-tall {
+            aspect-ratio: 2/4;
+        }
+        #aboutButton {
+            position: relative;
+            overflow: hidden;
+            transition: .3s linear;
+            text-transform: uppercase;
+        }
+        #aboutButton::before {
+            content: " ";
+            width: 100%;
+            height: 100%;
+            background-color: #212529;
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            transition: .3s linear;
+            transform: translateX(-100%);
+            z-index: -1;
+        }
+        #aboutButton:hover {
+            color: #f1f1f1;
+        }
+        #aboutButton:hover::before {
+            transform: translateX(0%);
+        }
+        .font-newroman {
+            font-family: 'Times New Roman', Times, serif;
+        }
+        .logo {
+            width: 70px;
+        }
+        .hero-img {
+            animation: scaleup 1000ms ease-out forwards;
+        }
+        #mobileNavbar {
+            transform: translateX(100%);
+            transition: all 500ms ease;
+        }
+        #mobileNavbar.opened {
+            transform: translateX(0) !important;
+        }
+        .hero-img {
+            transform: scale(0.5);
+            transition: all 1000ms ease-out;
+            /* animation: scaleup 1000ms ease-out infinite; */
+        }
+        .hero-img {
+            animation: wiggle 4000ms 1200ms ease-out infinite;
+        }
+        @keyframes scaleup {
+            from {
+                transform: scale(0.5);
+            } to {
+                transform: scale(1);
+            }
+        }
+        @keyframes wiggle {
+            0% {
+                transform: rotate(0deg);
+            }
+            25% {
+                transform: rotate(5deg);
+            }
+            50% {
+                transform: rotate(0deg)
+            }
+            75% {
+                transform: rotate(5deg)
+            }
+            100% {
+                transform: rotate(0deg)
+            }
+        }
+        .nav-link {
+            transition: all .4s ease;
+        }
+        .nav-link:hover, .nav-link.active {
+            opacity: .5;
+        }
+    </style>
+</head>
+<body class="bg-light">
+    <div class="container-fluid overflow-x-hidden">
+        <div class="row align-items-start vh-100 " style="padding-top: 150px;">
+            <aside class="col-2 left-0 top-0 d-none d-md-flex flex-column align-items-center justify-content-center h-auto">
+                <ul class="list-unstyled mt-3 text-dark">
+                    <li><a href="./index.html" class="nav-link mb-4 fw-bold text-uppercase"><span class="small">Home</span></a></li>
+                    <li><a href="./about.html" class="nav-link mb-4 fw-bold text-uppercase"><span class="small">about</span></a></li>
+                    <li><a href="./contact.html" class="nav-link mb-4 fw-bold text-uppercase active"><span class="small">contact</span></a></li>
+                    <li><a href="./gallery.html" class="nav-link mb-4 fw-bold text-uppercase"><span class="small">works</span></a></li>
+                </ul>
+                <div class="nav-brand logo d-flex justify-content-center align-items-center bg-dark text-light font-newroman mt-5" style="aspect-ratio: 1/1;"><h1 class="m-0 display-4">F</h1></div>
+                <div class="font-newroman small">Fern's Project</div>
+            </aside>
+            <nav class="navbar navbar-expand-lg mb-3 d-block d-md-none">
+                <div class="container">
+                    <div class="nav-brand logo d-flex justify-content-center align-items-center bg-dark text-light font-newroman" style="aspect-ratio: 1/1;"><h1 class="m-0 display-4">F</h1></div>
+                    <ul class="navbar nav ms-auto">
+                        <li class="nav-item"><button class="nav-link text-dark fs-1" id="openButton"><i class="fas fa-bars"></i></button></li>
+                    </ul>
+                </div>
+            </nav>
+            <aside class="vh-100 position-fixed bg-dark col-4 end-0 top-0 d-block d-md-none" style="padding-top: 150px;" id="mobileNavbar">
+                
+                <ul class="list-unstyled">
+                    <li class="text-center mb-4"><a href="./index.html" class="text-light text-decoration-none text-uppercase small fw-semibold">Home</a></li>
+                    <li class="text-center mb-4"><a href="./about.html" class="text-light text-decoration-none text-uppercase small fw-semibold">About</a></li>
+                    <li class="text-center mb-4"><a href="./contact.html" class="text-light text-decoration-none text-uppercase small fw-semibold">Contact</a></li>
+                    <li class="text-center mb-4"><a href="./gallery.html" class="text-light text-decoration-none text-uppercase small fw-semibold">Works</a></li>
+                </ul>
+                <button id="closeButton" class="btn text-light p-0 w-100 d-inline text-center"><i class="fas fa-x"></i></button>
+            </aside>
+            <main class="col-12 col-md-6">
+                <h2 class="text-center font-newroman">Contact Me</h2>
+                <p class="text-center small text-muted">Send your message to me</p>
+                <form action="#" class="w-100">
+                    <div class="row">
+                        <div class="col-12 mb-3">
+                            <input type="text" name="nama" id="nama" class="form-control rounded-0 border-0 border-bottom bg-transparent font-newroman" placeholder="Your Name">
+                        </div>
+                        <div class="col-12 mb-4">
+                            <input type="email" name="email" id="email" class="form-control rounded-0 border-0 border-bottom bg-transparent font-newroman" placeholder="yourmail@example.com">
+                        </div>
+                        <div class="col-12 mb-3">
+                            <textarea name="message" id="message" cols="30" rows="6" class="form-control rounded-0 bg-transparent font-newroman" placeholder="Text your message"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <a href="mailto:lyxthor22@gmail.com" class="btn btn-outline-secondary w-fit rounded-0" id="sendMessage">send message</a>
+                        </div>
+                    </div>
+                </form>
+            </main>
+            <section class="col-12 col-md-4 d-flex flex-column align-items-center">
+                <img src="./assets/img/circle2.png" alt="" class="w-50 hero-img d-none d-md-block">
+                <footer class="w-100 mt-5">
+                    <ul class="list-unstyled fw-bold text-dark small">
+                        <li><a href="mailto:lyxthor22@gmail.com" class="nav-link mb-3">lyxthor22@gmail.com</a></li>
+                        <li><a href="tel:+6285227608900" class="nav-link mb-3">0852-2760-8900</a></li>
+                        <li><a href="https://facebook.com" class="nav-link d-inline mb-3">Facebook</a> | <a href="https://instagram.com" class="nav-link d-inline mb-3">Instagram</a> | <a href="https://twitter.com" class="nav-link d-inline mb-3">Twitter</a></li>
+                    </ul>
+
+
+                </footer>
+               
+                
+                <!-- <img src="./assets/img/hero2.jpg" alt="" class="w-100 object-fit-contain position-absolute bottom-0" style="height: 110vh;transform: translateX(30%);filter: grayscale(120%) brightness(80%)"> -->
+            </section>
+        </div>
+    </div>
+    
+</body>
+<script src="./assets/js/script.js"></script>
+<script>
+    const namaInput = document.getElementById('nama')
+    const emailInput = document.getElementById('email')
+    const messageInput = document.getElementById('message')
+    const sendMessage = document.getElementById('sendMessage')
+    let namaVal
+    let emailVal
+    let messageVal
+    function setMessageHref() {
+        sendMessage.setAttribute('href', `mailto:lyxthor22@gmail.com?subject=Web%20%Request%20From%20%${emailVal}&body=Name%20%3A%20${namaVal}%0D%0AEmail%20%3A%20${emailVal}%0D%0A%0D%0AMessage%20%3A%0D%0A${messageVal}%0D%0A`)
+    }
+    namaInput.addEventListener('input', (e)=>{
+        namaVal = e.target.value
+        setMessageHref()
+    })
+    emailInput.addEventListener('input', (e)=>{
+        emailVal = e.target.value
+        setMessageHref()
+    })
+    messageInput.addEventListener('input', (e)=>{
+        messageVal = e.target.value
+        setMessageHref()
+    })
+    window.onload=()=>{
+        const heroImg = document.querySelectorAll('.hero-img')
+        heroImg.forEach((hero, index)=>{
+            hero.style.transform="scale(1)"
+        })
+    }
+</script>
+</html>
