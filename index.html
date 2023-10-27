@@ -121,24 +121,8 @@
         .nav-link:hover, .nav-link.active {
             opacity: .5;
         }
-        #paintSwitch::before, #paintSwitch::after {
-            background-color: orangered;
-            transform: scale(0);
-            opacity: 1;
-            transition: all .6s ease;
-            border-radius: 100%;
-        }
-        #paintSwitch {
-            cursor: pointer;
-            overflow: hidden;
-        }
-        #paintSwitch:hover > .paint {
-            transform: scale(2);
-            opacity: 1;
-        }
-        #paintSwitch.epilepsi > .paint {
-            background-color: #212529;
-        }
+        
+        
         
         
     </style>
@@ -153,8 +137,9 @@
                     <li><a href="./contact.html" class="nav-link mb-4 fw-bold text-uppercase"><span class="small">contact</span></a></li>
                     <li><a href="./gallery.html" class="nav-link mb-4 fw-bold text-uppercase"><span class="small">works</span></a></li>
                 </ul>
-                <div class="nav-brand logo d-flex justify-content-center align-items-center bg-dark text-light font-newroman mt-5 position-relative pointer" style="aspect-ratio: 1/1;" id="paintSwitch">
-                    
+                <div class="nav-brand logo d-flex justify-content-center bg-dark align-items-center text-light font-newroman mt-5 position-relative off" style="aspect-ratio: 1/1;" id="paintSwitch">
+                    <div id="paintOn"></div>
+                    <div id="paintOff"></div>
                     <h1 class="m-0 display-4 position-relative">F</h1>
                 </div>
                 <div class="font-newroman small">Fern's Project</div>
@@ -265,10 +250,12 @@
     const paintSwitch = document.getElementById('paintSwitch')
     let epilepsiStart
     paintSwitch.onclick=()=>{
-        paintSwitch.classList.toggle('epilepsi')
-        if(paintSwitch.classList.contains('epilepsi')) {
+        paintSwitch.classList.toggle('on')
+        if(paintSwitch.classList.contains('on')) {
+            paintSwitch.style.backgroundColor="red"
             epilepsiStart = setInterval(epilepsi, 400)
         } else {
+            paintSwitch.style.backgroundColor="#212529"
             clearInterval(epilepsiStart)
             document.body.classList.add('bg-light')
         }
@@ -279,7 +266,7 @@
         green = Math.random()*255
         blue = Math.random()*255
         document.body.classList.remove('bg-light')
-        document.body.style.transition="100ms linear"
+        document.body.style.transition="200ms linear"
         document.body.style.backgroundColor=`rgb(${red}, ${green}, ${blue})`
     }
     // function animateText() {

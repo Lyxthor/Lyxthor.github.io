@@ -186,7 +186,7 @@
     let emailVal
     let messageVal
     function setMessageHref() {
-        sendMessage.setAttribute('href', `mailto:lyxthor22@gmail.com?subject=Web%20%Request%20From%20%${emailVal}&body=Name%20%3A%20${namaVal}%0D%0AEmail%20%3A%20${emailVal}%0D%0A%0D%0AMessage%20%3A%0D%0A${messageVal}%0D%0A`)
+        sendMessage.setAttribute('href', `mailto:lyxthor22@gmail.com?subject=Web%20Request%20From%20${emailVal}&body=Name%20%3A%20${namaVal}%0D%0AEmail%20%3A%20${emailVal}%0D%0A%0D%0AMessage%20%3A%0D%0A${messageVal}%0D%0A`)
     }
     namaInput.addEventListener('input', (e)=>{
         namaVal = e.target.value
