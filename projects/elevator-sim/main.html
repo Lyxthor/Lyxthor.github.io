@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initUpial-scale=1.0">
+    <title>Elevator Simulation Program</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            height: 100%;
+        }
+        body {
+            overflow: hidden;
+            background-image: linear-gradient(to top,#a2d4e8, #6ab9dc )
+        }
+        #texture {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            inset: 0;
+            background-image: url('assets/img/texture-paper.png');
+            opacity: 0.9;
+        }
+        #simCvs, #numCvs, #imageCanvas {
+            position: absolute;
+            inset: 0;
+        }
+        input {
+            display: block;
+        }
+        #controller input[type='range'] {
+            width: 100%;
+        }
+        #controller {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            flex-wrap: wrap;
+        }
+        
+        .floorBtn {
+            display: block;
+            width: 30px;
+            aspect-ratio: 1/1;
+            position: absolute;
+        }
+        .floorBtnWrap {
+            position: relative;
+        }
+        #charts {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            width: 100vw;
+            height: 100vh;
+            /* display: flex;
+            justify-content: start; */
+
+        }
+        #charts canvas {
+            display: block;
+            margin-bottom: 1rem;
+        }
+        #varInputContainer {
+            position: absolute;
+        }
+        #varInputContainer input[type="number"] {
+            width: 50px;
+            padding: .2rem .5rem;
+            border: 1px solid lightgrey;
+            outline: none;
+        }
+        #charts {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="imageCanvas"></canvas>
+    <canvas id="simCvs"></canvas>
+    <canvas id="numCvs"></canvas>
+    <div id="texture"></div>
+    <div id="charts">
+        <div class="left">
+            <canvas id="accelCvs"></canvas>
+            <canvas id="veloCvs"></canvas>
+            <canvas id="peCvs"></canvas>
+        </div>
+        <div class="right">
+            <canvas id="keCvs"></canvas>
+            <canvas id="yPosCvs"></canvas>
+            <canvas id="powerCvs"></canvas>
+        </div>
+    </div>
+    <div id="controller">
+        <div id="floorBtnContainer">
+            <div class="floorBtnWrap">
+                <button type="button" class="floorBtn" value="6">6</button>
+            </div>
+            <div class="floorBtnWrap">
+                <button type="button" class="floorBtn" value="5">5</button>
+            </div>
+            <div class="floorBtnWrap">
+                <button type="button" class="floorBtn" value="4">4</button>
+            </div>
+            <div class="floorBtnWrap">
+                <button type="button" class="floorBtn" value="3">3</button>
+            </div>
+            <div class="floorBtnWrap">
+                <button type="button" class="floorBtn" value="2">2</button>
+            </div>
+            <div class="floorBtnWrap">
+                <button type="button" class="floorBtn" value="1">1</button>
+            </div>
+        </div>
+        <div id="varInputContainer">
+            <div>
+                <label for="massInput">mass(kg)</label>
+                <input type="number" id="massInput" value="0" min="0" max="800">
+            </div>
+            <button id="snapBtn">snap!</button>
+        </div>
+    </div>
+    
+</body>
+<script src="./assets/js/script.js"></script>
+<script src="./assets/js/simulation.js"></script>
+
+</html>
