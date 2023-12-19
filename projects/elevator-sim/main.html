@@ -79,9 +79,23 @@
             justify-content: space-between;
             align-items: center;
         }
+        #varDisplay {
+            position: absolute;
+            top: 110px;
+            left: 30%;
+            background-color: white;
+            border: 2px solid gold;
+            width: 100px;
+            padding: .5rem;
+            border-radius: .5rem;
+        }
+        #varDisplay ul {
+            list-style: none;
+        }
     </style>
 </head>
 <body>
+    
     <canvas id="imageCanvas"></canvas>
     <canvas id="simCvs"></canvas>
     <canvas id="numCvs"></canvas>
@@ -97,6 +111,14 @@
             <canvas id="yPosCvs"></canvas>
             <canvas id="powerCvs"></canvas>
         </div>
+    </div>
+    <div id="varDisplay">
+        <ul>
+            <li>accel : <span id="accelIndex"></span></li>
+            <li>velocity : <span id="veloIndex"></span></li>
+            <li>height : <span id="yPosIndex"></span></li>
+            <li>time : <span id="timeIndex"></span></li>
+        </ul>
     </div>
     <div id="controller">
         <div id="floorBtnContainer">

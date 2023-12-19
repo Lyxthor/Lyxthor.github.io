@@ -49,8 +49,11 @@ const floorBtns=document.querySelectorAll('.floorBtn')
 const varInputContainer=document.getElementById('varInputContainer')
 const massInput=document.getElementById('massInput')
 const snapBtn=document.getElementById('snapBtn')
-// set controllers' position
-setControllerPos()
+const accelIndex=document.getElementById('accelIndex')
+const veloIndex=document.getElementById('veloIndex')
+const yPosIndex=document.getElementById('yPosIndex')
+const timeIndex=document.getElementById('timeIndex')
+setControllerPos() // set controllers' position
 
 /* SIMULATION */
 // physics simulation's variables
@@ -80,7 +83,6 @@ let ke=0
 let balanceCondition='more-counter'
 let leftoverTime=0
 let simInvert=1
-
 
 // elevator simulation's variables
 const YStart=fullH-landHeight-(buildingHeight-floorHeight)-lineWidth*2
@@ -147,12 +149,8 @@ snapBtn.onclick=()=>{
 /* FUNCTIONS */
 function resetVar() {
     time=0;velo=0;yPos=0;deltaY=0;loadMass=parseFloat(massInput.value);liftMass=cabinMass+loadMass;liftWeight=liftMass*gravity;reqMotorForce=0;resultant=2000;forceDecrease=resultant/40;rawForce=liftWeight+resultant;accel=resultant/liftMass;power=0;pe=0;ke=0;lastH=0
-
     points=[];simulation=[];slowingPoints={accel:0,velo:0,yPos:0,deltaY:0,resultant:0,reqMotorForce:0,points:[]};rilTimePoints=[]
-
     chartXScale=0;powerScale=0;accelScale=0;veloScale=0;yPosScale=0;peScale=0;keScale=0;scalesComparisons={time:0,power:power,accel:accel,velo:velo,yPos:yPos,pe:pe,ke:ke}
-    
-
     yPos=currentPos
 }
 function setForces() {
@@ -223,7 +221,6 @@ function setScales() {
     peScale=(50)/scalesComparisons.pe
     keScale=(50)/scalesComparisons.ke
 }
-
 function pushPoint() {
     time=time+10
     deltaY=(velo*Math.sin(90*Math.PI/180)*10/1000)+(0.5*accel*10*10)/(1000*1000)
@@ -412,7 +409,6 @@ function initFall() {
         clearTimeout(sim)
     })
     simulation=[]
-    // let weightH=(YStart+lastH)/buildingScale
     cabinH=lastH/buildingScale
     cabinT=Math.sqrt(2*cabinH/gravity)*1000
     time=0
@@ -465,7 +461,7 @@ function initFall() {
 function simulate(delay) {
     numCtx.fillStyle="red"
     numCtx.textAlign="center"
-    let invert=
+
     setTimeout(()=>{
         points.forEach((point,index)=>{
             point.t-=point.Tplus
@@ -492,10 +488,15 @@ function simulate(delay) {
                 simCtx.stroke()
 
                 
-                numCtx.fillText(liftWeight,XEnd+liftCoridorWd/2,liftH+storeyHeight/2)
-                numCtx.fillText(liftWeight+point.f*simInvert,XEnd+liftCoridorWd/2,liftH+storeyHeight+20)
-                numCtx.fillText(counterWeight,XStart+counterWgCoridorWd/2,counH+storeyHeight/2)
+                numCtx.fillText(liftWeight.toFixed(2),XEnd+liftCoridorWd/2,liftH+storeyHeight/2)
+                // numCtx.fillText(liftWeight+point.f*simInvert,XEnd+liftCoridorWd/2,liftH+storeyHeight+20)
+                // numCtx.fillText(counterWeight+point.f*simInvert,XStart+counterWgCoridorWd/2,counH+storeyHeight+20)
+                numCtx.fillText(counterWeight.toFixed(2),XStart+counterWgCoridorWd/2,counH+storeyHeight/2)
+                accelIndex.innerHTML=point.a.toFixed(2)
+                veloIndex.innerHTML=point.v.toFixed(2)
+                yPosIndex.innerHTML=(point.y/buildingScale).toFixed(2)
                 point.t+=point.Tplus
+                timeIndex.innerHTML=(point.t/1000).toFixed(2)
                 console.log(point.Tplus)
                 lastH=point.y
                 lastT=point.t
@@ -511,13 +512,11 @@ function drawGraph() {
     setScales()
     let point0=rilTimePoints[0]
     let sekon=0
-    
     charts.forEach((c)=>{
         c.fillStyle=chartBgColor
         c.clearRect(0,0,chartW,chartH)
         c.fillRect(0,0,chartW,chartH)
         c.lineWidth=0.5
-        // alert(lastP.t)
         c.strokeStyle="lime"
         c.beginPath()
         c.moveTo(0,chartH/2)
@@ -534,29 +533,6 @@ function drawGraph() {
             console.log("berhasil")
         }
     })
-    // let scale=0
-    // scale=scalesComparisons.accel*accelScale
-    // for(let i=0;i<scale;i++) {
-    //     accelCtx.beginPath()
-    //     accelCtx.moveTo(0,i*accelScale)
-    //     accelCtx.lineTo(chartW,i*accelScale)
-    //     accelCtx.stroke()
-    // }
-    // scale=scalesComparisons.velo*veloScale
-    // for(let i=0;i<scale;i++) {
-    //     veloCtx.beginPath()
-    //     veloCtx.moveTo(0,i*veloScale)
-    //     veloCtx.lineTo(chartW,i*veloScale)
-    //     veloCtx.stroke()
-    // }
-    // scale=scalesComparisons.power*powerScale
-    // for(let i=0;i<50;i++) {
-    //     powerCtx.beginPath()
-    //     powerCtx.moveTo(0,i/powerScale)
-    //     powerCtx.lineTo(chartW,i/powerScale)
-    //     powerCtx.stroke()
-    // }
-    
     charts.forEach((c)=>{
         c.beginPath()
         c.font="12px sans-serif"
@@ -624,7 +600,6 @@ function drawInitialComponents() {
     simCtx.moveTo(XStart+(liftCoridorWd/2)-(lineWidth*2),YStart)
     simCtx.bezierCurveTo(wireStartX-15,wireStartY+10.5,wireStartX-15,wireStartY,wireStartX,wireStartY)
     simCtx.lineTo(wireEndX,wireEndY)
-    // simCtx.arcTo(XEnd+(liftCoridorWd/2)+10,YStart-floorHeight-(lineWidth*4)-40,XEnd+(liftCoridorWd/2)+20,YStart-floorHeight-(lineWidth*4)+40,40)
     simCtx.bezierCurveTo(wireEndX+20,wireEndY,wireEndX+20,wireEndY+14,wireEndX+20,wireEndY+80)
     simCtx.stroke()
 
@@ -645,6 +620,5 @@ function drawInitialComponents() {
 window.onload=()=>{
     resetVar()
     drawInitialComponents()
-    // initUpward()
 }
 
