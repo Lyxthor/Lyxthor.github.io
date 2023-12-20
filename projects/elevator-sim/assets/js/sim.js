@@ -61,6 +61,7 @@ const accelIndex=document.getElementById('accelIndex')
 const veloIndex=document.getElementById('veloIndex')
 const yPosIndex=document.getElementById('yPosIndex')
 const timeIndex=document.getElementById('timeIndex')
+const forceIndex=document.getElementById('forceIndex')
 setControllerPos() // set controllers' position
 
 /* SIMULATION */
@@ -545,6 +546,7 @@ function simulate() {
                 yPosIndex.innerHTML=(point.y/buildingScale).toFixed(2)
                 point.t+=point.Tplus
                 timeIndex.innerHTML=(point.t/1000).toFixed(2)
+                forceIndex.innerHTML=(point.f).toFixed(2)
                 lastH=point.y
                 lastT=point.t
                 rilTimePoints.push(point)
