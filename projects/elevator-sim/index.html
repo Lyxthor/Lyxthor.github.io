@@ -90,6 +90,9 @@
             width: 120px;
             padding: .5rem;
             border-radius: .2rem;
+            /* font-family: 'Times New Roman', Times, serif; */
+            text-transform: capitalize;
+            font-size: 12px;
         }
         #varDisplay ul {
             list-style: none;
@@ -112,15 +115,17 @@
             -webkit-box-shadow: 10px 10px 21px -10px rgba(33,27,27,0.3);
             -moz-box-shadow: 10px 10px 21px -10px rgba(33,27,27,0.3);
         }
-        #snapBtn {
-            background-color: orangered;
+        #snapBtn, #reloadBtn {
+            background-color: salmon;
             color: white;
             border-radius: .2rem;
             padding: .2rem .5rem;
             border: none;
             display: inline-block;
             cursor: pointer;
+            font-weight: bold;
         }
+        #reloadBtn {background-color: royalblue}
         #snapBtn:hover {
             opacity: .6;
         }
@@ -128,7 +133,10 @@
             width: auto;
             height: 50px;
             position: absolute;
-            /* animation: shake 0.5s infinite; */
+            /* animation: shake 4s infinite; */
+        }
+        #machine.on {
+            animation: shake .5s infinite;
         }
         @keyframes shake {
         0% { transform: translate(1px, 1px) rotate(0deg); }
@@ -148,8 +156,8 @@
 <body>
     <img src="./assets/img/machine.png" alt="" id="machine">
     <canvas id="imageCanvas"></canvas>
-    <canvas id="simCvs"></canvas>
     <canvas id="numCvs"></canvas>
+    <canvas id="simCvs"></canvas>
     <div id="charts">
         <div class="left">
             <canvas id="accelCvs"></canvas>
@@ -195,9 +203,8 @@
         </div>
         <div id="varInputContainer">
             <button id="snapBtn">snap!</button>
-
+            <button id="reloadBtn">reload</button>
             <div>
-
                 <label for="massInput">mass(kg)</label>
                 <input type="number" id="massInput" value="0" min="0" max="800">
             </div>
@@ -205,7 +212,7 @@
     </div>
     
 </body>
-<script src="./assets/js/script.js"></script>
-<script src="./assets/js/simulation.js"></script>
+<script src="./assets/js/image.js"></script>
+<script src="./assets/js/sim.js"></script>
 
 </html>

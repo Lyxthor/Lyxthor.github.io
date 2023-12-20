@@ -43,8 +43,8 @@ simCvs.width=numCvs.width=fullW
 // basic positions
 const YStart=fullH-landHeight-(buildingHeight-floorHeight)-lineWidth*2
 const YEnd=fullH-landHeight-storeyHeight-(lineWidth*2)
-const XStart=(fullW/2)-(coridorsArea/2)+counterWgCoridorWd-(lineWidth)
-const XEnd=(fullW/2)+(coridorsArea/2)-liftCoridorWd-lineWidth
+const XStart=(fullW/2)-(coridorW/2)
+const XEnd=(fullW/2)+(coridorW/2)-(lineWidth*0.5)
 
 /* CONTROLLERS */
 // get controllers' elements
@@ -55,6 +55,7 @@ const floorBtns=document.querySelectorAll('.floorBtn')
 const varInputContainer=document.getElementById('varInputContainer')
 const massInput=document.getElementById('massInput')
 const snapBtn=document.getElementById('snapBtn')
+const reloadBtn=document.getElementById('reloadBtn')
 const machine=document.getElementById('machine')
 const accelIndex=document.getElementById('accelIndex')
 const veloIndex=document.getElementById('veloIndex')
@@ -92,8 +93,10 @@ let leftoverTime=0
 let simInvert=1
 
 // elevator simulation's variables
+const counterColor="#212529"
+const liftColor="gray"
 let floorDestination=1
-let currentFloor=3
+let currentFloor=2
 let currentPos=0
 let direction="up"
 let lastT=0
@@ -138,7 +141,7 @@ floorBtns.forEach((floorBtn)=>{
         if(floorDestination!=currentFloor) {
             resetVar()
             floorDestination>currentFloor?init("up"):init("down")
-            simulate(500)
+            simulate()
         }
     }
 })
@@ -146,15 +149,20 @@ massInput.onInput=(e)=>{
     loadMass=parseFloat(e.target.value)
 }
 snapBtn.onclick=()=>{
+    countFallInit()
     initFall()
-    simulate(0)
+    simulateFall()
+    simulateCountFall()
 }
+reloadBtn.addEventListener('click',()=>{window.location.reload(true)})
 /* FUNCTIONS */
 function resetVar() {
     time=0;velo=0;yPos=0;deltaY=0;loadMass=parseFloat(massInput.value);liftMass=cabinMass+loadMass;liftWeight=liftMass*gravity;reqMotorForce=0;resultant=2000;forceDecrease=resultant/40;rawForce=liftWeight+resultant;accel=resultant/liftMass;power=0;pe=0;ke=0;lastH=0
     points=[];simulation=[];slowingPoints={accel:0,velo:0,yPos:0,deltaY:0,resultant:0,reqMotorForce:0,points:[]};rilTimePoints=[]
     chartXScale=0;powerScale=0;accelScale=0;veloScale=0;yPosScale=0;peScale=0;keScale=0;scalesComparisons={time:0,power:power,accel:accel,velo:velo,yPos:yPos,pe:pe,ke:ke}
     yPos=currentPos
+
+    numCtx.clearRect(0,0,fullW,fullH)
 }
 function setForces() {
     if(counterWeight-liftWeight>=defResultant) {// setForceFunction
@@ -201,19 +209,20 @@ function setForces() {
 function setControllerPos() {
     controller.style.width=`${fullW}px`
     controller.style.height=`${fullH}px`
-    floorBtnContainer.style.width=`${buildingWidth/2}px`
+    floorBtnContainer.style.width=`${buildingWidth}px`
     floorBtnContainer.style.height=`${buildingHeight+(lineWidth*2)}px`
     floorBtnContainer.style.marginBottom=`${landHeight}px`
+    floorBtnContainer.style.left="100px"
     varInputContainer.style.right=`${(window.innerWidth-buildingWidth)/2+40}px`
     varInputContainer.style.bottom=`${landHeight+(lineWidth*2)+10}px`
-    machine.style.left="60%"
+    machine.style.left="53.5%"
     machine.style.top=`${YStart-50-floorHeight-(lineWidth*3)}px`
     floorBtnWraps.forEach((btnWrap)=>{
         btnWrap.style.width=buildingWidth+"px"
         btnWrap.style.height=groundHeight+"px"
     })
     floorBtns.forEach((btn)=>{
-        btn.style.left=buildingWidth/4+"px"
+        btn.style.left=(buildingWidth/2)+(coridorW/2)+10+"px"
         btn.style.top=groundHeight/2+"px"
     })
 }
@@ -230,7 +239,7 @@ function pushPoint() {
     time=time+10
     deltaY=(velo*Math.sin(90*Math.PI/180)*10/1000)+(0.5*accel*10*10)/(1000*1000)
     yPos=((yPos/buildingScale)+deltaY)*buildingScale
-    pe=liftMass*gravity*(yPos/buildingScale)
+    pe=liftWeight*(yPos/buildingScale)
     ke=(liftMass*velo*velo)/2
     power=reqMotorForce*velo
     velo=velo+(accel*10/1000)
@@ -302,7 +311,7 @@ function initToIdlePoints(lastPointIsHighest) {
     slowingPoints.points.forEach((p)=>{
         let lastP=points[points.length-1]
         yPos=lastP.y+p.y
-        pe=liftMass*gravity*yPos/buildingScale
+        pe=liftWeight*yPos/buildingScale
         ke=(liftMass*p.v*p.v)/2
         power=p.f*p.v
         points.push({
@@ -404,10 +413,40 @@ function init(dir) {
     initToIdlePoints(lastPointIsHighest)
 }
 let cabinH=0
+
+let countT=0
 let cabinT=0
-let sekon=0
+let countPoints=[]
+function countFallInit() {
+    let countY0=0
+    let countH=0
+    let countAY=0
+    let countV=0
+    let Tmax=0
+    countPoints=[]
+    countY0=lastH>0?(YEnd-YStart)-lastH:(YEnd-YStart)-yPos
+    countH=countY0/buildingScale
+    console.log(lastH)
+    console.log(countH)
+    Tmax=Math.sqrt(2*countH/gravity)*1000
+    console.log(lastT)
+    for(let i=0;i<Math.floor(Tmax/10);i++){
+        countAY=(countV*10/1000)+(0.5*-gravity*10*10)/(1000*1000)
+        countY0=((countY0/buildingScale)+countAY)*buildingScale
+        countV=countV+(-gravity*10/1000)
+        countPoints.push({
+            y: countY0,
+            t: 10*i
+        })
+    }
+    leftoverTime=Tmax%10
+    countAY=(countV*leftoverTime/1000)+(0.5*-gravity*leftoverTime*leftoverTime)/(1000*1000)
+    countY0=((countY0/buildingScale)+countAY)*buildingScale
+    countV=countV+(-gravity*leftoverTime/1000)
+}
 function initFall() {
-    console.log(rilTimePoints)
+    lastH=lastH>0?lastH:currentPos
+    lastT=rilTimePoints.length>0?lastT:0
     points=[]
     clearTimeout(drawGraphStamp)
     simulation.forEach((sim)=>{
@@ -415,6 +454,7 @@ function initFall() {
     })
     simulation=[]
     cabinH=lastH/buildingScale
+    // cabinT=Math.sqrt(2*cabinH/gravity)*1000
     cabinT=Math.sqrt(2*cabinH/gravity)*1000
     time=0
     velo=0
@@ -422,7 +462,7 @@ function initFall() {
     for(let i=0;i<Math.floor(cabinT/10);i++) {
         deltaY=(velo*Math.sin(90*Math.PI/180)*10/1000)+(0.5*-gravity*10*10)/(1000*1000)
         yPos=((yPos/buildingScale)+deltaY)*buildingScale
-        pe=liftMass*gravity*(yPos/buildingScale)
+        pe=liftWeight*(yPos/buildingScale)
         ke=(liftMass*velo*velo)/2
         power=0
         velo=velo+(-gravity*10/1000)
@@ -443,9 +483,9 @@ function initFall() {
     time+=leftoverTime
     deltaY=(velo*Math.sin(90*Math.PI/180)*leftoverTime/1000)+(0.5*-gravity*leftoverTime*leftoverTime)/(1000*1000)
     yPos=((yPos/buildingScale)+deltaY)*buildingScale
-    pe=liftMass*gravity*(yPos/buildingScale)
+    pe=liftWeight*(yPos/buildingScale)
     ke=(liftMass*velo*velo)/2
-    power=liftWeight*velo
+    power=0
     velo=velo+(-gravity*10/1000)
     points.push({
         y: yPos,
@@ -463,54 +503,106 @@ function initFall() {
     currentPos=0
 }
 
-function simulate(delay) {
-    numCtx.fillStyle=chartLnColor
-    numCtx.textAlign="center"
-
-    setTimeout(()=>{
-        points.forEach((point,index)=>{
+simCtx.textAlign="center"
+simCtx.font="12px arial"
+function simulate() {
+    simCtx.fillStyle=chartLnColor
+    
+        points.forEach((point)=>{
             point.t-=point.Tplus
             let liftH=0
             let counH=0
             simulation.push(setTimeout(()=>{
-                simCtx.fillStyle=movingPartColor
                 liftH=YEnd-point.y
                 counH=YStart+point.y
                 simCtx.clearRect(0,YStart,fullW,buildingHeight)
-                numCtx.clearRect(0,YStart,fullW,buildingHeight)
-                simCtx.fillRect(XEnd,liftH,liftCoridorWd,storeyHeight)
-                simCtx.fillRect(XStart,counH,counterWgCoridorWd,storeyHeight)
-                simCtx.drawImage(load, XEnd+(liftCoridorWd/2)-25,liftH+storeyHeight-50,50,50)
-
-                simCtx.beginPath()
-                simCtx.moveTo(XEnd+(liftCoridorWd/2),YStart)
-                simCtx.lineTo(XEnd+(liftCoridorWd/2),liftH)
-                simCtx.stroke()
-
-                simCtx.beginPath()
-                simCtx.moveTo(XStart+(counterWgCoridorWd/2),YStart)
-                simCtx.lineTo(XStart+(counterWgCoridorWd/2),counH)
-                simCtx.stroke()
-
                 
-                numCtx.fillText(liftWeight.toFixed(2),XEnd+liftCoridorWd/2,liftH+storeyHeight/2)
-                // numCtx.fillText(liftWeight+point.f*simInvert,XEnd+liftCoridorWd/2,liftH+storeyHeight+20)
-                // numCtx.fillText(counterWeight+point.f*simInvert,XStart+counterWgCoridorWd/2,counH+storeyHeight+20)
-                numCtx.fillText(counterWeight.toFixed(2),XStart+counterWgCoridorWd/2,counH+storeyHeight/2)
+                simCtx.fillStyle=counterColor
+                simCtx.fillRect(XStart,counH,coridorW,storeyHeight)
+                for(let i=-2;i<=2;i++) {
+                    simCtx.beginPath()
+                    simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart)
+                    simCtx.lineTo(XStart+(coridorW/2)+(8*i),counH)
+                    simCtx.stroke()
+                }
+                simCtx.fillStyle=liftColor
+                simCtx.fillText(counterWeight.toFixed(2),XStart+coridorW/2,counH+storeyHeight/2)
+
+                simCtx.fillStyle=liftColor
+                simCtx.fillRect(XStart,liftH,coridorW,storeyHeight)
+                simCtx.drawImage(load, XStart+(coridorW/2)-25,liftH+storeyHeight-50,50,50)
+                for(let i=-2;i<=2;i++) {
+                    simCtx.beginPath()
+                    simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart)
+                    simCtx.lineTo(XStart+(coridorW/2)+(8*i),liftH)
+                    simCtx.stroke()
+                }
+                simCtx.fillStyle=counterColor
+                simCtx.fillText(liftWeight.toFixed(2),XStart+coridorW/2,liftH+storeyHeight/2)
+
                 accelIndex.innerHTML=point.a.toFixed(2)
                 veloIndex.innerHTML=point.v.toFixed(2)
                 yPosIndex.innerHTML=(point.y/buildingScale).toFixed(2)
                 point.t+=point.Tplus
                 timeIndex.innerHTML=(point.t/1000).toFixed(2)
-                console.log(point.Tplus)
                 lastH=point.y
                 lastT=point.t
                 rilTimePoints.push(point)
-                
             },point.t))
         })
-    },delay)
     drawGraphStamp=setTimeout(drawGraph, points[points.length-1].t+1000)
+}
+function simulateFall() {
+    points.forEach((point)=>{
+        let liftH=0
+        let counH=0
+        point.t-=point.Tplus
+        simulation.push(setTimeout(()=>{
+            liftH=YEnd-point.y
+            counH=point.yN
+            simCtx.clearRect(0,YStart,fullW,buildingHeight)
+            
+            // simCtx.fillStyle=counterColor
+            // simCtx.fillRect(XStart,counH,coridorW,storeyHeight)
+            for(let i=-2;i<=2;i++) {
+                simCtx.beginPath()
+                simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart)
+                simCtx.lineTo(XStart+(coridorW/2)+(8*i),YStart+lastH)
+                simCtx.stroke()
+            }
+            // simCtx.fillStyle=liftColor
+            // simCtx.fillText(counterWeight.toFixed(2),XStart+coridorW/2,counH+storeyHeight/2)
+
+            simCtx.fillStyle=liftColor
+            simCtx.fillRect(XStart,liftH,coridorW,storeyHeight)
+            simCtx.drawImage(load, XStart+(coridorW/2)-25,liftH+storeyHeight-50,50,50)
+            for(let i=-2;i<=2;i++) {
+                simCtx.beginPath()
+                simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart)
+                simCtx.lineTo(XStart+(coridorW/2)+(8*i),YEnd-lastH)
+                simCtx.stroke()
+            }
+            simCtx.fillStyle=counterColor
+            simCtx.fillText(liftWeight.toFixed(2),XStart+coridorW/2,liftH+storeyHeight/2)
+
+            accelIndex.innerHTML=point.a.toFixed(2)
+            veloIndex.innerHTML=point.v.toFixed(2)
+            yPosIndex.innerHTML=(point.y/buildingScale).toFixed(2)
+            point.t+=point.Tplus
+            timeIndex.innerHTML=(point.t/1000).toFixed(2)
+            rilTimePoints.push(point)
+        },point.t))
+    })
+    drawGraphStamp=setTimeout(drawGraph, points[points.length-1].t+1000)
+}
+function simulateCountFall() {
+    numCtx.fillStyle=counterColor
+    countPoints.forEach((p)=>{
+        setTimeout(()=>{
+            numCtx.clearRect(XStart,YStart,coridorW,buildingHeight)
+            numCtx.fillRect(XStart,YEnd-p.y,coridorW,storeyHeight)
+        },p.t)
+    })
 }
 function drawChartGridLn() {
     charts.forEach((c)=>{
@@ -544,11 +636,9 @@ function drawGraph() {
     setScales()
     drawChartGridLn()
     let point0=rilTimePoints[0]
-    
     charts.forEach((c)=>{
-        c.beginPath()
-        
         c.strokeStyle=chartLnColor
+        c.beginPath()
     })
     powerCtx.moveTo(point0.t*chartXScale,chartH/2-(point0.p*powerScale))
     accelCtx.moveTo(point0.t*chartXScale,chartH/2-(point0.a*accelScale))
@@ -556,10 +646,6 @@ function drawGraph() {
     yPosCtx.moveTo(point0.t*chartXScale,chartH/2-(point0.y*yPosScale))
     peCtx.moveTo(point0.t*chartXScale,chartH/2-(point0.pe*peScale))
     keCtx.moveTo(point0.t*chartXScale,chartH/2-(point0.ke*keScale))
-
-    
-
-    
     for(let i=1;i<rilTimePoints.length;i++) {
         powerCtx.lineTo(rilTimePoints[i].t*chartXScale,chartH/2-(rilTimePoints[i].p*powerScale))
         accelCtx.lineTo(rilTimePoints[i].t*chartXScale,chartH/2-(rilTimePoints[i].a*accelScale))
@@ -571,7 +657,6 @@ function drawGraph() {
     charts.forEach((c)=>{
         c.stroke()
     })
-    console.log(rilTimePoints)
     rilTimePoints=[]
 }
 function drawInitialComponents() {
@@ -582,48 +667,51 @@ function drawInitialComponents() {
     })
     simCtx.fillStyle=movingPartColor
     simCtx.strokeStyle=holderPartColor
-    simCtx.font="18px arial"
-    simCtx.fillStyle="gray"
-    simCtx.beginPath()
-    simCtx.arc(XStart+(counterWgCoridorWd/2)+15,YStart-floorHeight-(lineWidth*4)-15,15,0,(2*Math.PI))
-    simCtx.fill()
-
-    simCtx.beginPath()
-    simCtx.arc(XEnd+(liftCoridorWd/2)-20,YStart-floorHeight-(lineWidth*4)-20,20,0,(2*Math.PI))
-    simCtx.fill()
-
-    simCtx.fillStyle="black"
-    simCtx.fillRect(XEnd+(liftCoridorWd/2)-25,YStart-floorHeight-((lineWidth*4)+15),10,(lineWidth*4)+15)
-    simCtx.fillRect(XStart+(counterWgCoridorWd/2)+10,YStart-floorHeight-((lineWidth*4)+15),10,(lineWidth*4)+15)
-    simCtx.fillStyle="gray"
-
-    const wireStartX=XStart+(counterWgCoridorWd/2)+15
-    const wireEndX=XEnd+(liftCoridorWd/2)-20
-    const wireStartY=YStart-floorHeight-(lineWidth*4)-30
-    const wireEndY=YStart-floorHeight-(lineWidth*4)-40
-    simCtx.strokeStyle="black"
-    simCtx.beginPath()
-    simCtx.moveTo(XStart+(liftCoridorWd/2)-(lineWidth*2),YStart)
-    simCtx.bezierCurveTo(wireStartX-15,wireStartY+10.5,wireStartX-15,wireStartY,wireStartX,wireStartY)
-    simCtx.lineTo(wireEndX,wireEndY)
-    simCtx.bezierCurveTo(wireEndX+20,wireEndY,wireEndX+20,wireEndY+14,wireEndX+20,wireEndY+80)
-    simCtx.stroke()
-
-    simCtx.fillRect(XEnd,YEnd-yPos,liftCoridorWd,storeyHeight)
-    simCtx.fillRect(XStart,YStart+yPos,counterWgCoridorWd,storeyHeight)
-    simCtx.drawImage(load, XEnd+(liftCoridorWd/2)-25,YEnd+storeyHeight-50-yPos,50,50)
-
-    simCtx.beginPath()
-    simCtx.moveTo(XEnd+(liftCoridorWd/2),YStart)
-    simCtx.lineTo(XEnd+(liftCoridorWd/2),YEnd-yPos)
-    simCtx.stroke()
-
-    simCtx.beginPath()
-    simCtx.moveTo(XStart+(counterWgCoridorWd/2),YStart)
-    simCtx.lineTo(XStart+(counterWgCoridorWd/2),YStart+yPos)
-    simCtx.stroke()
+    simCtx.fillStyle=holderPartColor
+    simCtx.fillRect(XStart-(lineWidth*1.5),YStart-floorHeight-(lineWidth*4)-25,(lineWidth*1.5),25)
+    simCtx.fillRect(XEnd+(lineWidth*0.5),YStart-floorHeight-(lineWidth*4)-25,(lineWidth*1.5),25)
+    simCtx.fillStyle="gold"
+    simCtx.fillRect(XStart,YStart-floorHeight-(lineWidth*4)-30,(lineWidth*1.5),20)
+    simCtx.fillRect(XEnd+(lineWidth*0.5)-(lineWidth*1.5),YStart-floorHeight-(lineWidth*4)-30,(lineWidth*1.5),20)
+    simCtx.fillStyle=movingPartColor
+    simCtx.fillRect(XStart+(lineWidth*1.5),YStart-floorHeight-(lineWidth*4)-30,coridorW-(lineWidth*1.5*2),20)
+    for(let i=-2;i<=2;i++) {
+        simCtx.beginPath()
+        simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart-floorHeight-(lineWidth*4)-30)
+        simCtx.lineTo(XStart+(coridorW/2)+(8*i),YStart)
+        simCtx.stroke()
+    }
+    simCtx.fillStyle=counterColor
+    simCtx.fillRect(XStart,YStart+yPos,coridorW,storeyHeight)
+    for(let i=-2;i<=2;i++) {
+        simCtx.beginPath()
+        simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart)
+        simCtx.lineTo(XStart+(coridorW/2)+(8*i),YStart+yPos)
+        simCtx.stroke()
+    }
+    simCtx.fillStyle=liftColor
+    simCtx.fillText(counterWeight.toFixed(2),XStart+coridorW/2,YStart+storeyHeight/2+yPos)
+    simCtx.fillStyle=liftColor     
+    for(let i=-2;i<=2;i++) {
+        simCtx.beginPath()
+        simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart)
+        simCtx.lineTo(XStart+(coridorW/2)+(8*i),YEnd-yPos)
+        simCtx.stroke()
+    } 
+    simCtx.fillRect(XStart,YEnd-yPos,coridorW,storeyHeight)
+    simCtx.drawImage(load, XStart+(coridorW/2)-25,YEnd+storeyHeight-50-yPos,50,50)
+    simCtx.fillStyle=counterColor
+    simCtx.fillText(liftWeight.toFixed(2),XStart+coridorW/2,YEnd+storeyHeight/2-yPos)      
+}
+function clearStamp() {
+    points.forEach((p)=>{
+        clearTimeout(p)
+    })
+    clearTimeout(drawGraphStamp)
 }
 window.onload=()=>{
+    // window.location.reload(true)
+    // clearStamp()
     resetVar()
     drawChartGridLn()
     drawInitialComponents()
