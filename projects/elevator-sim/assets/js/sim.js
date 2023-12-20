@@ -242,6 +242,7 @@ function pushPoint() {
     yPos=((yPos/buildingScale)+deltaY)*buildingScale
     pe=liftWeight*(yPos/buildingScale)
     ke=(liftMass*velo*velo)/2
+    // power=pe+ke
     power=reqMotorForce*velo
     velo=velo+(accel*10/1000)
     points.push({
@@ -274,7 +275,7 @@ function setSlowingPointVar(invert) {
             t: slowingPoints.time,
             v: slowingPoints.velo,
             a: slowingPoints.accel,
-            f: slowingPoints.resultant
+            f: slowingPoints.reqMotorForce
         })
         slowingPoints.deltaY+=slowingPoints.yPos
         setSlowingPointResultant()
@@ -315,6 +316,7 @@ function initToIdlePoints(lastPointIsHighest) {
         pe=liftWeight*yPos/buildingScale
         ke=(liftMass*p.v*p.v)/2
         power=p.f*p.v
+        // power=p
         points.push({
             y: yPos,
             t: lastP.t+10,
@@ -337,12 +339,12 @@ function initAccelPoints() {
     if(direction=="up") {
         while(velo<1.61) { // acceleration step
             pushPoint()
-            scalesComparisons.power=resultant*velo
+            // scalesComparisons.power=resultant*velo
         }
     } else if(direction=="down" ) {
         while(velo>-1.61) { // acceleration step
             pushPoint()
-            scalesComparisons.power=resultant*velo
+            // scalesComparisons.power=resultant*velo
         }
     }
 }
@@ -350,7 +352,7 @@ function initDeAccelPoints() {
     if(direction=="up"&&balanceCondition=="more-counter") {
         while(accel>0) {
             pushPoint()
-            scalesComparisons.power=resultant*velo
+            // scalesComparisons.power=resultant*velo
             reqMotorForce+=forceDecrease
             resultant=counterWeight-(liftWeight+reqMotorForce)
             accel=resultant/liftMass
@@ -358,7 +360,7 @@ function initDeAccelPoints() {
     } else if(direction=="down"&&balanceCondition=="more-counter") {
         while(accel<0) {
             pushPoint()
-            scalesComparisons.power=resultant*velo
+            // scalesComparisons.power=resultant*velo
             reqMotorForce-=forceDecrease
             resultant=(counterWeight-liftWeight)+reqMotorForce
             accel=resultant/liftMass
@@ -366,7 +368,7 @@ function initDeAccelPoints() {
     } else if(direction=="up"&&balanceCondition=="more-load") {
         while(accel>0) {
             pushPoint()
-            scalesComparisons.power=resultant*velo
+            // scalesComparisons.power=resultant*velo
             reqMotorForce-=forceDecrease
             resultant=(counterWeight+reqMotorForce)-liftWeight
             accel=resultant/liftMass
@@ -374,7 +376,7 @@ function initDeAccelPoints() {
     } else if(direction=="down"&&balanceCondition=="more-load") {
         while(accel<0) {
             pushPoint()
-            scalesComparisons.power=resultant*velo
+            // scalesComparisons.power=resultant*velo
             reqMotorForce-=forceDecrease
             resultant=reqMotorForce-(counterWeight-liftWeight)
             accel=resultant/liftMass
