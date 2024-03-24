@@ -1,0 +1,222 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+html, body {
+    height: 100%;
+}
+#app {
+    height: 100%;
+}
+header {
+    width: 1080px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 30px 0;
+}
+#gameTitle {
+    margin-bottom: 8px;
+}
+#gameSubtitle {
+    margin-bottom: 12px;
+}
+#btnStart {
+    padding: .5rem 2rem;
+    border-radius: .5rem;
+    border: 1px solid #ddd;
+    background-color: transparent;
+    transition: .4s;
+    cursor: pointer;
+}
+#btnStart:hover {
+    border-color: orangered;
+    background-color: orangered;
+    color: white;
+}
+#decks {
+    max-width: 560px;
+    margin: 0 auto;
+    /* background-color: #ddd; */
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.deck {
+    /* width: fit-content; */
+    display: flex;
+    gap: 6px;
+    background-color: red;
+}
+.deck:nth-child(1) {
+    justify-content: start;
+}
+.deck:nth-child(2) {
+    justify-content: center;
+}
+.deck:nth-child(3) {
+    justify-content: end;
+}
+.card {
+    width: calc(100% / 7 * 1 - 6px);
+    box-sizing: border-box;
+    height: 110px;
+    border-radius: 8px;
+    transform-style: preserve-3d;
+    transition: all .6s ease;
+    position: relative;
+    border: 1px solid #010101;
+}
+.deck.collapse .card {
+    margin-left: calc((1/7 * 100% * -1 - 8px));
+}
+.deck .card:first-child {
+    margin-left: 0px;
+}
+/* .card:hover {
+    transform: rotateY(180deg);
+} */
+.card .front-face {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background-color: orangered;
+    position: absolute;
+    backface-visibility: hidden;
+}
+.card .back-face {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background-color: royalblue;
+    position: absolute;
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
+}
+footer {
+    width: 805px;
+    margin: 0 auto;
+    text-align: right;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* * {
+    margin: 0;
+    padding: 0;
+}
+html, body {
+    height: 100%;
+}
+#app {
+    height: 100%;
+}
+header {
+    width: 1080px;
+    margin: 0 auto;
+    text-align: center;
+    padding: 30px 0;
+}
+#gameTitle {
+    margin-bottom: 8px;
+}
+#gameSubtitle {
+    margin-bottom: 12px;
+}
+#btnStart {
+    padding: .5rem 2rem;
+    border-radius: .5rem;
+    border: 1px solid #ddd;
+    background-color: transparent;
+    transition: .4s;
+    cursor: pointer;
+}
+#btnStart:hover {
+    border-color: orangered;
+    background-color: orangered;
+    color: white;
+}
+#decks {
+    max-width: 560px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.deck {
+    display: flex;
+    gap: 6px;
+    background-color: red;
+}
+.deck:nth-child(1) {
+    justify-content: start;
+}
+.deck:nth-child(2) {
+    justify-content: center;
+}
+.deck:nth-child(3) {
+    justify-content: end;
+}
+.card {
+    width: calc(100% / 7 * 1 - 6px);
+    box-sizing: border-box;
+    height: 110px;
+    border-radius: 8px;
+    transform-style: preserve-3d;
+    transition: all .9s ease;
+    position: relative;
+    border: 1px solid #010101;
+}
+#decks.collapse .deck-1 {
+    margin-left: calc(100% / 7 * 1 * -1);
+    background-color: red;
+}
+#decks.collapse .deck-2 {
+    margin-left: calc(100% / 7 * 1 * -1);
+    background-color: red;
+}
+#decks.collapse .deck-3 {
+    margin-left: calc(100% / 7 * 1 * -1);
+    background-color: red;
+}
+#decks.collapse .card.deck-1:first-child {
+    margin-left: 0px;
+}
+#decks.collapse .card.deck-2:nth-child(8) {
+    margin-left: 0px;
+}
+#decks.collapse .card.deck-3:nth-child(15) {
+    margin-left: 0px;
+}
+
+.card .front-face {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background-color: orangered;
+    position: absolute;
+    backface-visibility: hidden;
+}
+.card .back-face {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    background-color: royalblue;
+    position: absolute;
+    transform: rotateY(180deg);
+    backface-visibility: hidden;
+}
+footer {
+    width: 805px;
+    margin: 0 auto;
+    text-align: right;
+} */

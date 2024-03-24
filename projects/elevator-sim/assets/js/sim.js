@@ -38,6 +38,8 @@ const load=new Image()
 load.src="./assets/img/person.svg"
 simCtx.fillStyle=movingPartColor
 simCtx.lineWidth=lineWidth/2
+simCtx.textAlign="center"
+simCtx.font="12px arial"
 simCvs.height=numCvs.height=fullH
 simCvs.width=numCvs.width=fullW
 // basic positions
@@ -80,7 +82,7 @@ let liftMass=cabinMass+loadMass
 let liftWeight=liftMass*gravity
 let upForce=0
 let downForce=0
-let reqMotorForce=0
+let mForce=0
 let defResultant=2000
 let resultant=2000
 let forceDecrease=defResultant/40
@@ -106,15 +108,19 @@ let points=[]
 let simulation=[]
 let rilTimePoints=[]
 let slowingPoints=
-{ // to temporary save deacceleration to 0 speed points which later will be push in points array
+{ // to temporary save deacceleration to 0 velocity points which later will be push in points array
     accel: 0,
     velo: 0,
     yPos: 0,
     deltaY: 0,
     resultant: 0,
-    reqMotorForce: 0,
+    mForce: 0,
     points: []
 }
+let cabinH=0
+let countT=0
+let cabinT=0
+let countPoints=[]
 // scalles' variables
 let buildingScale=buildingHeight/(4*floors)
 let chartXScale=0
@@ -124,7 +130,7 @@ let veloScale=0
 let yPosScale=0
 let peScale=0
 let keScale=0
-let scalesComparisons=
+let scales=
 {
     time: 0,
     power: power,
@@ -135,6 +141,7 @@ let scalesComparisons=
     ke: ke
 }
 currentPos=(currentFloor*4-4)*buildingScale
+
 /* EVENTS LISTENERS */
 floorBtns.forEach((floorBtn)=>{
     floorBtn.onclick=(e)=>{
@@ -156,11 +163,12 @@ snapBtn.onclick=()=>{
     simulateCountFall()
 }
 reloadBtn.addEventListener('click',()=>{window.location.reload(true)})
+
 /* FUNCTIONS */
 function resetVar() {
-    time=0;velo=0;yPos=0;deltaY=0;loadMass=parseFloat(massInput.value);liftMass=cabinMass+loadMass;liftWeight=liftMass*gravity;reqMotorForce=0;resultant=2000;forceDecrease=resultant/40;rawForce=liftWeight+resultant;accel=resultant/liftMass;power=0;pe=0;ke=0;lastH=0
-    points=[];simulation=[];slowingPoints={accel:0,velo:0,yPos:0,deltaY:0,resultant:0,reqMotorForce:0,points:[]};rilTimePoints=[]
-    chartXScale=0;powerScale=0;accelScale=0;veloScale=0;yPosScale=0;peScale=0;keScale=0;scalesComparisons={time:0,power:power,accel:accel,velo:velo,yPos:yPos,pe:pe,ke:ke}
+    time=0;velo=0;yPos=0;deltaY=0;loadMass=parseFloat(massInput.value);liftMass=cabinMass+loadMass;liftWeight=liftMass*gravity;mForce=0;resultant=2000;forceDecrease=resultant/40;rawForce=liftWeight+resultant;accel=resultant/liftMass;power=0;pe=0;ke=0;lastH=0
+    points=[];simulation=[];slowingPoints={accel:0,velo:0,yPos:0,deltaY:0,resultant:0,mForce:0,points:[]};rilTimePoints=[]
+    chartXScale=0;powerScale=0;accelScale=0;veloScale=0;yPosScale=0;peScale=0;keScale=0;scales={time:0,power:power,accel:accel,velo:velo,yPos:yPos,pe:pe,ke:ke}
     yPos=currentPos
 
     numCtx.clearRect(0,0,fullW,fullH)
@@ -169,16 +177,16 @@ function setForces() {
     if(counterWeight-liftWeight>=defResultant) {// setForceFunction
         switch(direction) {
             case "up" : 
-                reqMotorForce=counterWeight-liftWeight-defResultant
-                resultant=counterWeight-(liftWeight+reqMotorForce)
+                mForce=counterWeight-liftWeight-defResultant
+                resultant=counterWeight-(liftWeight+mForce)
                 accel=resultant/liftMass
                 balanceCondition='more-counter'
                 forceDecrease=forceDecrease
                 simInvert=1
                 break;
             case "down" :
-                reqMotorForce=liftWeight-counterWeight-defResultant
-                resultant=(counterWeight-liftWeight)+reqMotorForce
+                mForce=liftWeight-counterWeight-defResultant
+                resultant=(counterWeight-liftWeight)+mForce
                 accel=resultant/liftMass
                 balanceCondition='more-counter'
                 forceDecrease=-forceDecrease
@@ -188,16 +196,16 @@ function setForces() {
     } else if(counterWeight-liftWeight<defResultant) {
         switch(direction) {
             case "up" : 
-                reqMotorForce=liftWeight-counterWeight+defResultant
-                resultant=(counterWeight+reqMotorForce)-liftWeight
+                mForce=liftWeight-counterWeight+defResultant
+                resultant=(counterWeight+mForce)-liftWeight
                 accel=resultant/liftMass
                 balanceCondition='more-load'
                 forceDecrease=forceDecrease
                 simInvert=1
                 break;
             case "down" :
-                reqMotorForce=counterWeight-liftWeight-defResultant
-                resultant=reqMotorForce-(counterWeight-liftWeight)
+                mForce=counterWeight-liftWeight-defResultant
+                resultant=mForce-(counterWeight-liftWeight)
                 accel=resultant/liftMass
                 balanceCondition='more-load'
                 forceDecrease=-forceDecrease
@@ -228,13 +236,13 @@ function setControllerPos() {
     })
 }
 function setScales() {
-    chartXScale=chartW/scalesComparisons.time
-    powerScale=(50)/scalesComparisons.power
-    accelScale=(50)/scalesComparisons.accel
-    veloScale=(50)/scalesComparisons.velo
-    yPosScale=(50)/scalesComparisons.yPos
-    peScale=(50)/scalesComparisons.pe
-    keScale=(50)/scalesComparisons.ke
+    chartXScale=chartW/scales.time
+    powerScale=(50)/scales.power
+    accelScale=(50)/scales.accel
+    veloScale=(50)/scales.velo
+    yPosScale=(50)/scales.yPos
+    peScale=(50)/scales.pe
+    keScale=(50)/scales.ke
 }
 function pushPoint() {
     time=time+10
@@ -242,15 +250,14 @@ function pushPoint() {
     yPos=((yPos/buildingScale)+deltaY)*buildingScale
     pe=liftWeight*(yPos/buildingScale)
     ke=(liftMass*velo*velo)/2
-    // power=pe+ke
-    power=reqMotorForce*velo
+    power=mForce*velo
     velo=velo+(accel*10/1000)
     points.push({
         y: yPos,
         t: time,
         v: velo,
         a: accel,
-        f: reqMotorForce,
+        f: mForce,
         p: power,
         pe: pe,
         ke: ke,
@@ -262,9 +269,8 @@ function setSlowingPointVar(invert) {
     slowingPoints.velo=velo
     slowingPoints.yPos=yPos
     slowingPoints.resultant=resultant
-    slowingPoints.reqMotorForce=reqMotorForce
+    slowingPoints.mForce=mForce
     slowingPoints.time=0
-    let limiter=0
     while(slowingPoints.velo*invert>0) {
         slowingPoints.time+=10
         deltaY=(0.5*slowingPoints.accel*10*10)/(1000*1000)
@@ -275,48 +281,44 @@ function setSlowingPointVar(invert) {
             t: slowingPoints.time,
             v: slowingPoints.velo,
             a: slowingPoints.accel,
-            f: slowingPoints.reqMotorForce
+            f: slowingPoints.mForce
         })
         slowingPoints.deltaY+=slowingPoints.yPos
         setSlowingPointResultant()
         slowingPoints.accel=slowingPoints.resultant/liftMass
-        limiter++
     }
 }
 function setSlowingPointResultant() {
     if(direction=="up"&&balanceCondition=="more-counter") {
-        slowingPoints.resultant=counterWeight-(liftWeight+slowingPoints.reqMotorForce) 
-        slowingPoints.reqMotorForce+=forceDecrease
+        slowingPoints.resultant=counterWeight-(liftWeight+slowingPoints.mForce) 
+        slowingPoints.mForce+=forceDecrease
     }
     else if(direction=="down"&&balanceCondition=="more-counter") {
-        slowingPoints.resultant=(counterWeight-liftWeight)+slowingPoints.reqMotorForce
-        slowingPoints.reqMotorForce-=forceDecrease
+        slowingPoints.resultant=(counterWeight-liftWeight)+slowingPoints.mForce
+        slowingPoints.mForce-=forceDecrease
     }   
     else if(direction=="up"&&balanceCondition=="more-load") {
-        slowingPoints.resultant=(counterWeight+slowingPoints.reqMotorForce)-liftWeight
-        slowingPoints.reqMotorForce-=forceDecrease
+        slowingPoints.resultant=(counterWeight+slowingPoints.mForce)-liftWeight
+        slowingPoints.mForce-=forceDecrease
     }
     else if(direction=="down"&&balanceCondition=="more-load") {
-        slowingPoints.resultant=slowingPoints.reqMotorForce-(counterWeight-liftWeight)
-        slowingPoints.reqMotorForce-=forceDecrease
+        slowingPoints.resultant=slowingPoints.mForce-(counterWeight-liftWeight)
+        slowingPoints.mForce-=forceDecrease
     }
 }
 function initConsSpeedPoints() {
     let currentHeight=points[points.length-1].y
     let lackHeight=(((floorDestination*4-4)*buildingScale)-currentHeight-slowingPoints.deltaY)/buildingScale
     let lackTime=(lackHeight/velo*1000)
-    scalesComparisons.velo=velo // set scalesComparisons.velo when velocity is constant
-    scalesComparisons.ke=(liftMass*velo*velo)/2 // set scalesComparisons.ke(kinetic energy) after max velocity were setted
     for(let i=0;i<=Math.floor(lackTime/10);i++) pushPoint()
 }
-function initToIdlePoints(lastPointIsHighest) {
+function initToIdlePoints() {
     slowingPoints.points.forEach((p)=>{
         let lastP=points[points.length-1]
         yPos=lastP.y+p.y
         pe=liftWeight*yPos/buildingScale
         ke=(liftMass*p.v*p.v)/2
         power=p.f*p.v
-        // power=p
         points.push({
             y: yPos,
             t: lastP.t+10,
@@ -329,9 +331,6 @@ function initToIdlePoints(lastPointIsHighest) {
             Tplus: 0
         })
     })
-    let highestPoint=lastPointIsHighest?points.length-1:0
-    scalesComparisons.yPos=points[highestPoint].y
-    scalesComparisons.pe=points[highestPoint].pe // set scalesComparisons.pe at point with highest y position
     currentPos=(floorDestination*4-4)*buildingScale
     currentFloor=floorDestination
 }
@@ -339,52 +338,52 @@ function initAccelPoints() {
     if(direction=="up") {
         while(velo<1.61) { // acceleration step
             pushPoint()
-            // scalesComparisons.power=resultant*velo
+            scales.power=resultant*velo
         }
     } else if(direction=="down" ) {
         while(velo>-1.61) { // acceleration step
             pushPoint()
-            // scalesComparisons.power=resultant*velo
+            scales.power=resultant*velo
         }
     }
 }
-function initDeAccelPoints() {
+function initDeaccelPoints() {
     if(direction=="up"&&balanceCondition=="more-counter") {
         while(accel>0) {
             pushPoint()
-            // scalesComparisons.power=resultant*velo
-            reqMotorForce+=forceDecrease
-            resultant=counterWeight-(liftWeight+reqMotorForce)
+            scales.power=resultant*velo
+            mForce+=forceDecrease
+            resultant=counterWeight-(liftWeight+mForce)
             accel=resultant/liftMass
         }
     } else if(direction=="down"&&balanceCondition=="more-counter") {
         while(accel<0) {
             pushPoint()
-            // scalesComparisons.power=resultant*velo
-            reqMotorForce-=forceDecrease
-            resultant=(counterWeight-liftWeight)+reqMotorForce
+            scales.power=resultant*velo
+            mForce-=forceDecrease
+            resultant=(counterWeight-liftWeight)+mForce
             accel=resultant/liftMass
         }
     } else if(direction=="up"&&balanceCondition=="more-load") {
         while(accel>0) {
             pushPoint()
-            // scalesComparisons.power=resultant*velo
-            reqMotorForce-=forceDecrease
-            resultant=(counterWeight+reqMotorForce)-liftWeight
+            scales.power=resultant*velo
+            mForce-=forceDecrease
+            resultant=(counterWeight+mForce)-liftWeight
             accel=resultant/liftMass
         }
     } else if(direction=="down"&&balanceCondition=="more-load") {
         while(accel<0) {
             pushPoint()
-            // scalesComparisons.power=resultant*velo
-            reqMotorForce-=forceDecrease
-            resultant=reqMotorForce-(counterWeight-liftWeight)
+            scales.power=resultant*velo
+            mForce-=forceDecrease
+            resultant=mForce-(counterWeight-liftWeight)
             accel=resultant/liftMass
         }
     }
 }
 function getComparison() {
-    scalesComparisons =
+    scales =
     {
         time: 0,
         power: power,
@@ -395,31 +394,26 @@ function getComparison() {
         ke: ke
     }
     for(let pt of rilTimePoints) {
-        scalesComparisons.time=Math.abs(pt.t) > scalesComparisons.time?Math.abs(pt.t):scalesComparisons.time
-        scalesComparisons.power=Math.abs(pt.p) > scalesComparisons.power?Math.abs(pt.p):scalesComparisons.power,
-        scalesComparisons.accel=Math.abs(pt.a) > scalesComparisons.accel?Math.abs(pt.a):scalesComparisons.accel,
-        scalesComparisons.velo=Math.abs(pt.v) > scalesComparisons.velo?Math.abs(pt.v):scalesComparisons.velo,
-        scalesComparisons.yPos=Math.abs(pt.y) > scalesComparisons.yPos?Math.abs(pt.y):scalesComparisons.yPos,
-        scalesComparisons.pe=Math.abs(pt.pe) > scalesComparisons.pe?Math.abs(pt.pe):scalesComparisons.pe,
-        scalesComparisons.ke=Math.abs(pt.ke) > scalesComparisons.ke?Math.abs(pt.ke):scalesComparisons.ke
+        scales.time=Math.abs(pt.t) > scales.time?Math.abs(pt.t):scales.time
+        scales.power=Math.abs(pt.p) > scales.power?Math.abs(pt.p):scales.power,
+        scales.accel=Math.abs(pt.a) > scales.accel?Math.abs(pt.a):scales.accel,
+        scales.velo=Math.abs(pt.v) > scales.velo?Math.abs(pt.v):scales.velo,
+        scales.yPos=Math.abs(pt.y) > scales.yPos?Math.abs(pt.y):scales.yPos,
+        scales.pe=Math.abs(pt.pe) > scales.pe?Math.abs(pt.pe):scales.pe,
+        scales.ke=Math.abs(pt.ke) > scales.ke?Math.abs(pt.ke):scales.ke
     }
 }
 function init(dir) {
     direction=dir
     let invert=(direction==='up')?1:-1
-    let lastPointIsHighest=(direction==='up')
     setForces()
     initAccelPoints() 
-    initDeAccelPoints()
+    initDeaccelPoints()
     setSlowingPointVar(invert) // deacceleration to 0 speed step 1 : set points
     initConsSpeedPoints() // moving at constant speed step
-    initToIdlePoints(lastPointIsHighest)
+    initToIdlePoints()
 }
-let cabinH=0
 
-let countT=0
-let cabinT=0
-let countPoints=[]
 function countFallInit() {
     let countY0=0
     let countH=0
@@ -429,10 +423,7 @@ function countFallInit() {
     countPoints=[]
     countY0=lastH>0?(YEnd-YStart)-lastH:(YEnd-YStart)-yPos
     countH=countY0/buildingScale
-    console.log(lastH)
-    console.log(countH)
     Tmax=Math.sqrt(2*countH/gravity)*1000
-    console.log(lastT)
     for(let i=0;i<Math.floor(Tmax/10);i++){
         countAY=(countV*10/1000)+(0.5*-gravity*10*10)/(1000*1000)
         countY0=((countY0/buildingScale)+countAY)*buildingScale
@@ -450,6 +441,7 @@ function countFallInit() {
 function initFall() {
     lastH=lastH>0?lastH:currentPos
     lastT=rilTimePoints.length>0?lastT:0
+    mForce=0
     points=[]
     clearTimeout(drawGraphStamp)
     simulation.forEach((sim)=>{
@@ -457,7 +449,6 @@ function initFall() {
     })
     simulation=[]
     cabinH=lastH/buildingScale
-    // cabinT=Math.sqrt(2*cabinH/gravity)*1000
     cabinT=Math.sqrt(2*cabinH/gravity)*1000
     time=0
     velo=0
@@ -475,7 +466,7 @@ function initFall() {
             v: velo,
             a: gravity,
             p: power,
-            f: reqMotorForce,
+            f: mForce,
             pe: pe,
             ke: ke,
             Tplus: lastT
@@ -495,7 +486,7 @@ function initFall() {
         t: lastT+time,
         v: velo,
         a: gravity,
-        f: reqMotorForce,
+        f: mForce,
         p: power,
         pe: pe,
         ke: ke,
@@ -505,78 +496,67 @@ function initFall() {
     currentFloor=1
     currentPos=0
 }
-
-simCtx.textAlign="center"
-simCtx.font="12px arial"
 function simulate() {
     simCtx.fillStyle=chartLnColor
-    
-        points.forEach((point)=>{
-            point.t-=point.Tplus
-            let liftH=0
-            let counH=0
-            simulation.push(setTimeout(()=>{
-                liftH=YEnd-point.y
-                counH=YStart+point.y
-                simCtx.clearRect(0,YStart,fullW,buildingHeight)
-                
-                simCtx.fillStyle=counterColor
-                simCtx.fillRect(XStart,counH,coridorW,storeyHeight)
-                for(let i=-2;i<=2;i++) {
-                    simCtx.beginPath()
-                    simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart)
-                    simCtx.lineTo(XStart+(coridorW/2)+(8*i),counH)
-                    simCtx.stroke()
-                }
-                simCtx.fillStyle=liftColor
-                simCtx.fillText(counterWeight.toFixed(2),XStart+coridorW/2,counH+storeyHeight/2)
+    points.forEach((point)=>{
+        point.t-=point.Tplus
+        let liftH=0
+        let counH=0
+        simulation.push(setTimeout(()=>{
+            liftH=YEnd-point.y
+            counH=YStart+point.y
+            simCtx.clearRect(0,YStart,fullW,buildingHeight)
+            
+            simCtx.fillStyle=counterColor
+            simCtx.fillRect(XStart,counH,coridorW,storeyHeight)
+            for(let i=-2;i<=2;i++) {
+                simCtx.beginPath()
+                simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart)
+                simCtx.lineTo(XStart+(coridorW/2)+(8*i),counH)
+                simCtx.stroke()
+            }
+            simCtx.fillStyle=liftColor
+            simCtx.fillText(counterWeight.toFixed(2),XStart+coridorW/2,counH+storeyHeight/2)
 
-                simCtx.fillStyle=liftColor
-                simCtx.fillRect(XStart,liftH,coridorW,storeyHeight)
-                simCtx.drawImage(load, XStart+(coridorW/2)-25,liftH+storeyHeight-50,50,50)
-                for(let i=-2;i<=2;i++) {
-                    simCtx.beginPath()
-                    simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart)
-                    simCtx.lineTo(XStart+(coridorW/2)+(8*i),liftH)
-                    simCtx.stroke()
-                }
-                simCtx.fillStyle=counterColor
-                simCtx.fillText(liftWeight.toFixed(2),XStart+coridorW/2,liftH+storeyHeight/2)
+            simCtx.fillStyle=liftColor
+            simCtx.fillRect(XStart,liftH,coridorW,storeyHeight)
+            simCtx.drawImage(load, XStart+(coridorW/2)-25,liftH+storeyHeight-50,50,50)
+            for(let i=-2;i<=2;i++) {
+                simCtx.beginPath()
+                simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart)
+                simCtx.lineTo(XStart+(coridorW/2)+(8*i),liftH)
+                simCtx.stroke()
+            }
+            simCtx.fillStyle=counterColor
+            simCtx.fillText(liftWeight.toFixed(2),XStart+coridorW/2,liftH+storeyHeight/2)
 
-                accelIndex.innerHTML=point.a.toFixed(2)
-                veloIndex.innerHTML=point.v.toFixed(2)
-                yPosIndex.innerHTML=(point.y/buildingScale).toFixed(2)
-                point.t+=point.Tplus
-                timeIndex.innerHTML=(point.t/1000).toFixed(2)
-                forceIndex.innerHTML=(point.f).toFixed(2)
-                lastH=point.y
-                lastT=point.t
-                rilTimePoints.push(point)
-            },point.t))
-        })
+            accelIndex.innerHTML=point.a.toFixed(2)
+            veloIndex.innerHTML=point.v.toFixed(2)
+            yPosIndex.innerHTML=(point.y/buildingScale).toFixed(2)
+            point.t+=point.Tplus
+            timeIndex.innerHTML=(point.t/1000).toFixed(2)
+            forceIndex.innerHTML=(point.f).toFixed(2)
+            lastH=point.y
+            lastT=point.t
+            rilTimePoints.push(point)
+        },point.t))
+    })
     drawGraphStamp=setTimeout(drawGraph, points[points.length-1].t+1000)
 }
 function simulateFall() {
     points.forEach((point)=>{
         let liftH=0
-        let counH=0
         point.t-=point.Tplus
         simulation.push(setTimeout(()=>{
             liftH=YEnd-point.y
             counH=point.yN
             simCtx.clearRect(0,YStart,fullW,buildingHeight)
-            
-            // simCtx.fillStyle=counterColor
-            // simCtx.fillRect(XStart,counH,coridorW,storeyHeight)
             for(let i=-2;i<=2;i++) {
                 simCtx.beginPath()
                 simCtx.moveTo(XStart+(coridorW/2)+(8*i),YStart)
                 simCtx.lineTo(XStart+(coridorW/2)+(8*i),YStart+lastH)
                 simCtx.stroke()
             }
-            // simCtx.fillStyle=liftColor
-            // simCtx.fillText(counterWeight.toFixed(2),XStart+coridorW/2,counH+storeyHeight/2)
-
             simCtx.fillStyle=liftColor
             simCtx.fillRect(XStart,liftH,coridorW,storeyHeight)
             simCtx.drawImage(load, XStart+(coridorW/2)-25,liftH+storeyHeight-50,50,50)
@@ -594,6 +574,7 @@ function simulateFall() {
             yPosIndex.innerHTML=(point.y/buildingScale).toFixed(2)
             point.t+=point.Tplus
             timeIndex.innerHTML=(point.t/1000).toFixed(2)
+            forceIndex.innerHTML=(point.f).toFixed(2)
             rilTimePoints.push(point)
         },point.t))
     })
@@ -714,12 +695,9 @@ function clearStamp() {
     clearTimeout(drawGraphStamp)
 }
 window.onload=()=>{
-    // window.location.reload(true)
-    // clearStamp()
     resetVar()
     drawChartGridLn()
     drawInitialComponents()
     drawChartGridLn()
-    
 }
 

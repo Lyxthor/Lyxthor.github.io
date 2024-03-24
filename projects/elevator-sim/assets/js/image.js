@@ -13,8 +13,6 @@ let lineWidth=floorHeight/4
 storeyHeight=storeyHeight-floorHeight
 let liftCoridorWd=floorWidth*4
 let coridorW=floorWidth*4
-let counterWgCoridorWd=floorWidth*3
-let coridorsArea=floorWidth*18
 let landWidth=window.innerWidth
 let landHeight=16
 
@@ -48,9 +46,4 @@ for(let j=1;j<=floors;j++) {
 ctx.fillStyle=`#7c5232`
 ctx.fillRect(((cvs.width/2)-(liftCoridorWd/2)-(lineWidth*1.5)),cvs.height-landHeight-(lineWidth*2)-(groundHeight*floors)+floorHeight, (lineWidth*1.5),(groundHeight*(floors))-floorHeight)
 ctx.fillRect(((cvs.width/2)+(liftCoridorWd/2)),cvs.height-landHeight-(lineWidth*2)-(groundHeight*floors)+floorHeight,(lineWidth*1.5),(groundHeight*(floors))-floorHeight)
-
-// COUNTER WEIGHT CORIDOR'S FRAME
-// ctx.fillStyle=`#7c5232`
-// ctx.fillRect(((cvs.width/2-(coridorsArea/2))+counterWgCoridorWd-(lineWidth*2.5)),cvs.height-landHeight-(lineWidth*2)-(groundHeight*floors)+floorHeight, (lineWidth*1.5),(groundHeight*(floors))-floorHeight)
-// ctx.fillRect(((cvs.width/2-(coridorsArea/2))+(counterWgCoridorWd*2)-(lineWidth)),cvs.height-landHeight-(lineWidth*2)-(groundHeight*floors)+floorHeight,(lineWidth*1.5),(groundHeight*(floors))-floorHeight)
 

@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Projectile Physics Simulation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        html, body {
+            height: 100%;
+        }
+        #app {
+            width: 100%;
+            height: 100%;
+            background-color: #242526;
+        }
+        #canvases {
+            width: 960px;
+            height: 480px;
+            position: relative;
+            margin: 0 auto;
+        }
+        #canvases canvas {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        #canvases #yRuler {
+            border-left: 2px solid #3a3b3c;
+        }
+        #canvases #xRuler {
+            border-bottom: 2px solid #3a3b3c;
+        }
+        #controlPanel {
+            width: 240px;
+            padding: 20px 10px;
+            position: absolute;
+            right: 0px;
+            top: 0px;
+            transform: translate(-25%, 10%);
+            text-align: center;
+            background-color: rgba(0,0,0,.2);
+            backdrop-filter: blur(10px);
+            color: #e4e6eb;
+            border-radius: 10px;
+        }
+        #controllers {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        #btnStart {
+            margin-top: 10px;
+            background-color: orangered;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            padding: .2rem .5rem;
+        }
+        #btnInspect {
+            border: none;
+            border-radius: 5px;
+            background-color: royalblue;
+            color: white;
+            padding: .2rem .5rem;
+        }
+        #btnStart:hover {
+            background-color: rgb(214, 59, 3)
+        }
+        #btnInspect:hover {
+            background-color: rgb(56, 91, 193);
+        }
+        #controlPanel button {
+            cursor: pointer;
+        }
+        .controller input[type="range"] {
+            display: block;
+        }
+        #timePositionPanel {
+            display: none;
+            width: 300px;
+            position: absolute;
+            top: 0;
+            right: 400px;
+            color: #f1f1f1;
+            transform: translateY(10%);
+        }
+        #timePositionPanel div {
+            margin: 10px 0;
+            display: flex;
+            justify-content: space-between;
+        }
+        #timePositionPanel input[type="number"] {
+            background-color: #ccc;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <div id="canvases">
+            <canvas id="yRuler"></canvas>
+            <canvas id="xRuler"></canvas>
+            <canvas id="variablePanel"></canvas>
+            <canvas id="forMovingLine"></canvas>
+            <canvas id="forMovingBall"></canvas>
+            <canvas id="forIdleBall"></canvas>
+            <canvas id="forPointedPosition"></canvas>
+        </div>
+        <div id="controlPanel">
+            <div id="controllers">
+                <div class="controller gravityController">
+                    <label for="gravitySlider">gravity <span class="gravityIndex">9.8</span> m/s<sup>2</sup></label>
+                    <input type="range" id="gravitySlider" min="1" max="10" step="0.1" value="9.8">
+                </div>
+                <div class="controller speedController">
+                    <label for="speedSlider">velocity <span class="speedIndex">10</span> m/s</label>
+                    <input type="range" id="speedSlider" min="10" max="30" step="1" value="10">
+                </div>
+                <div class="controller angleController">
+                    <label for="angleSlider">angle <span class="angleIndex">10</span> &deg;</label>
+                    <input type="range" id="angleSlider" min="10" max="90" step="1" value="10">
+                </div>
+            </div>
+            <button id="btnStart">MULAI</button>
+            <button id="btnInspect">INSPECT</button>
+        </div>
+        <div id="timePositionPanel">
+            <h1>Position & Time</h1>
+            <div>
+                <label for="time">Time</label>
+                <input type="number" id="time" readonly>
+            </div>
+            <div>
+                <label for="range">Range</label>
+                <input type="number" id="range" readonly>
+            </div>
+            <div>
+                <label for="Height">Height</label>
+                <input type="number" id="height" readonly>
+            </div>
+        </div>
+    </div>
+</body>
+<script>
+    // CANVAS ELEMENTS
+    const cvsVrPanel = document.getElementById('variablePanel')
+    const cvsMovingLine = document.getElementById('forMovingLine')
+    const cvsPointedPosition = document.getElementById('forPointedPosition')
+    const cvsMovingBall = document.getElementById('forMovingBall')
+    const cvsIdleBall = document.getElementById('forIdleBall')
+    const cvsYRuler = document.getElementById('yRuler')
+    const cvsXRuler = document.getElementById('xRuler')
+    var ctxVrPanel = cvsVrPanel.getContext('2d')
+    var ctxMovingLine = cvsMovingLine.getContext('2d')
+    var ctxPointedPosition = cvsPointedPosition.getContext('2d')
+    var ctxMovingBall = cvsMovingBall.getContext('2d')
+    var ctxIdleBall = cvsIdleBall.getContext('2d')
+    var canvasWidth = window.innerWidth
+    var canvasHeight = 480
+    var ballR = 14
+    var lineR = 1
+    cvsVrPanel.width = cvsMovingLine.width = cvsPointedPosition.width = cvsMovingBall.width = cvsIdleBall.width = canvasWidth
+    cvsVrPanel.height = cvsMovingLine.height = cvsPointedPosition.height = cvsMovingBall.height = cvsIdleBall.height = canvasHeight
+    cvsXRuler.width = canvasWidth
+    cvsXRuler.height = canvasHeight - ballR * 2
+    cvsYRuler.width = canvasWidth - ballR * 4
+    cvsYRuler.height = cvsVrPanel.height =  canvasHeight - ballR * 2
+    ctxMovingBall.fillStyle = ctxIdleBall.fillStyle =  "#8083b8";
+    ctxMovingLine.fillStyle = "#3a3b3c"
+    ctxVrPanel.strokeStyle = "red"
+    ctxVrPanel.fillStyle = "#818181";
+    ctxPointedPosition.fillStyle = "#e3242b"
+    ctxVrPanel.font = "18px verdana";
+    // CONTROL ELEMENTS
+    const app = document.getElementById('app')
+    const btnStart = document.getElementById('btnStart')
+    const btnInspect = document.getElementById('btnInspect')
+    const gravitySlider = document.getElementById('gravitySlider')
+    const speedSlider = document.getElementById('speedSlider')
+    const angleSlider = document.getElementById('angleSlider')
+    const gravityIndex = document.querySelector('.gravityIndex')
+    const speedIndex = document.querySelector('.speedIndex')
+    const angleIndex = document.querySelector('.angleIndex')
+    const timePositionPanel = document.getElementById('timePositionPanel')
+    const timeIndex = document.getElementById('time')
+    const rangeIndex = document.getElementById('range')
+    const heightIndex = document.getElementById('height')
+    app.style.cursor = "not-allowed"
+    // SIMULATION VARIABLES
+    var angle = 10
+    var speed = 10
+    var ballTic = 5
+    var lineTic = 100
+    var x0 = 0
+    var y0 = canvasHeight
+    var movingObjectX0 = x0 + ballR * 2
+    var movingObjectY0 = y0 - ballR * 2
+    var g = 9.8 / 1000
+    var TFinal = ((speed * Math.sin(angle * Math.PI/180)) / (0.5 * g))
+    var ballsCoordinates = []
+    var linesCoordinates = []
+    var lastBallPosition = []
+    var linesPositionHistories = []
+    var pointedPosition = {x: 0, y: 0, t: 0}
+    var furthestX = 0
+    var pointedX = 0
+    var pointedY = 0
+    var pointedT = 0
+    var inspect = false
+    // EVENT LISTENERS
+    window.addEventListener('load', ()=>{
+        draw(movingObjectX0, movingObjectY0, ballR, ctxIdleBall)
+        drawCannon(angle)
+        fillVariablePanel()
+        init()
+    })
+    gravitySlider.addEventListener('input', (e)=>{
+        g = parseFloat(e.target.value) / 1000
+        updateStatus(gravityIndex, g*1000)
+    })
+    speedSlider.addEventListener('input', (e)=>{
+        speed = parseInt(e.target.value)
+        updateStatus(speedIndex, speed)
+    })
+    angleSlider.addEventListener('input', (e)=>{
+        angle = parseInt(e.target.value)
+        updateStatus(angleIndex, angle)
+        drawCannon(angle)
+    })
+    btnStart.addEventListener('click', ()=>{
+        simulate()
+    })
+    btnInspect.addEventListener('click', ()=>{
+        setInspectState()
+    })
+    window.addEventListener('click',(e)=>{
+        setPointedPosition(e)
+    })
+    // FUNCTIONS
+    function updateStatus(index, value) {
+        TFinal = ((speed * Math.sin(angle * Math.PI/180)) / (0.5 * g))
+        index.innerHTML = value
+        fillVariablePanel()
+        init()
+    }
+    function fillVariablePanel() {
+        ctxVrPanel.clearRect(40, 20, 120, 110)
+        ctxVrPanel.fillText(`Gravity : ${g*1000}`, 40, 40)
+        ctxVrPanel.fillText(`Angle : ${angle}`, 40, 80)
+        ctxVrPanel.fillText(`Velocity : ${speed}`, 40, 120)
+    }
+    function simulate() {
+        if(lastBallPosition.length >= 3) {clearCanvas()}
+        saveLinesHistories()
+        setLastBallPosition()
+        saveFurthestX(lastBallPosition[0].x)
+        ballsCoordinates.forEach((c, index)=>{
+            setTimeout(()=>{
+                draw(c.x, c.y, ballR, ctxMovingBall)
+            },c.t)
+        })
+        linesCoordinates.forEach((c, index)=>{
+            setTimeout(()=>{
+                drawLine(c.x, c.y, c.r)
+            },c.t)
+        })
+        drawCurrentLastBall()
+    }
+    function init() {
+        var T = 0
+        var x_pos = 0
+        var y_pos = 0
+        var R = 1
+        ballsCoordinates = []
+        linesCoordinates = []
+        for(let i = 1;i < Math.round(TFinal/ballTic);i++) {
+            T = T+ballTic
+            x_pos = (speed*Math.cos(-angle * Math.PI / 180)*T/100) * 2 + movingObjectX0
+            y_pos = ((speed*Math.sin(-angle * Math.PI / 180)*T/100 + (0.5 * g * T * T)/100)) * 2 + movingObjectY0
+            ballsCoordinates.push({
+                x: x_pos.toFixed(2),
+                y: y_pos.toFixed(2),
+                t: T
+            })
+        }
+        T = T+(TFinal%ballTic)
+        x_pos = (speed*Math.cos(-angle * Math.PI / 180)*T/100) * 2 + movingObjectX0
+        y_pos = ((speed*Math.sin(-angle * Math.PI / 180)*T/100 + (0.5 * g * T * T)/100)) * 2 + movingObjectY0
+        ballsCoordinates.push({
+            x: x_pos,
+            y: y_pos,
+            t: T
+        })
+        for(let i = 1;i < Math.round(TFinal/lineTic);i++) {
+            T = lineTic * i
+            x_pos = (speed*Math.cos(-angle * Math.PI / 180)*T/100) * 2 + movingObjectX0
+            y_pos = ((speed*Math.sin(-angle * Math.PI / 180)*T/100 + (0.5 * g * T * T)/100)) * 2 + movingObjectY0
+            R = 4
+            linesCoordinates.push({
+                x: x_pos.toFixed(2),
+                y: y_pos.toFixed(2),
+                r: R,
+                t: T
+            })
+        }
+        ballsCoordinates[ballsCoordinates.length-1].y = movingObjectY0
+    }
+    function showTimePosition(x_pos, y_pos) {
+        timePositionPanel.style.display = "block"
+        timePositionPanel.style.left = x_pos+"px"
+        timePositionPanel.style.top = y_pos+"px"
+        timePositionPanel.style.transform = "translateY(-110%)"
+    }
+    function closeTimePosition() {
+        timePositionPanel.style.display = "none"
+    }
+    function draw(x_pos, y_pos, r, ctx) {
+        ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+        ctx.beginPath()
+        ctx.arc(x_pos, y_pos, r, 0, 2 * Math.PI)
+        ctx.fill()
+    }
+    function drawLine(x_pos, y_pos, R) {
+        ctxMovingLine.beginPath()
+        ctxMovingLine.arc(x_pos, y_pos, R, 0, 2 * Math.PI)
+        ctxMovingLine.fill()
+    }
+    function drawIdleBall(x_pos, y_pos) {
+        ctxIdleBall.beginPath()
+        ctxIdleBall.arc(x_pos, y_pos, ballR, 0, 2 * Math.PI)
+        ctxIdleBall.fill()
+    }
+    function drawPointedPosition(x_pos, y_pos, R) {
+        ctxPointedPosition.clearRect(0, 0, canvasWidth, canvasHeight)
+        ctxPointedPosition.beginPath()
+        ctxPointedPosition.arc(x_pos, y_pos, R, 0, 2 * Math.PI)
+        ctxPointedPosition.fill()
+    }
+    function drawCurrentLastBall() {
+        var currentLastBall = lastBallPosition[lastBallPosition.length-1]
+        var x_pos = currentLastBall.x
+        var y_pos = currentLastBall.y
+        setTimeout(()=>{
+            drawIdleBall(x_pos, y_pos)
+        }, currentLastBall.t)
+    }
+    function drawCannon(angle) {
+        angle = angle * -1
+        ctxVrPanel.clearRect(0,cvsVrPanel.height-200, 600, 200);
+        
+        ctxVrPanel.save()
+        ctxVrPanel.beginPath()
+        ctxVrPanel.translate(0+56/2, cvsVrPanel.height)
+        ctxVrPanel.rotate(angle * Math.PI / 180)
+        ctxVrPanel.rect(-56/2, -50/2, 150, 50)
+        ctxVrPanel.fillStyle = "#f1f1f1"
+        ctxVrPanel.fill()
+        ctxVrPanel.restore()
+
+        ctxVrPanel.beginPath()
+        ctxVrPanel.arc(movingObjectX0, movingObjectY0, 50, 0, angle * Math.PI / 180, true)
+        ctxVrPanel.stroke()
+    }
+    function setInspectState() {
+        if(inspect === false) {
+            inspect = true
+            app.style.cursor = "crosshair"
+        } else {
+            inspect = false
+            app.style.cursor = "not-allowed"
+        }
+    }
+    function setLastBallPosition() {
+        lastBallPosition.push(ballsCoordinates[ballsCoordinates.length-1])
+    }
+    function setPointedPosition(event) {
+        if(inspect) {
+            var x_pos = event.clientX
+            var y_pos = event.clientY
+            var continueChecking = true
+            var i = 0
+            var j = 0
+            var balls = lastBallPosition
+            var lines = linesPositionHistories
+            while(continueChecking && i < balls.length) {
+                if((x_pos >= balls[i].x - 18 && x_pos <= balls[i].x + 18) && (y_pos >= balls[i].y - 18 && y_pos <= balls[i].y + 18))
+                {
+                    continueChecking = false
+                    pointedPosition = balls[i]
+                    setPointedIndexs(true)
+                    showTimePosition(x_pos, y_pos)
+                    drawPointedPosition(pointedPosition.x, pointedPosition.y, ballR)
+                    break
+                }
+                i++
+            }
+            console.log("x terjauh : "+furthestX)
+            if(continueChecking) {
+                while(continueChecking && j < lines.length) {
+                    lines[j].forEach((line, index)=>{
+                        if((x_pos >= line.x-10 && x_pos <= line.x+10)&&(y_pos >= line.y-10 && y_pos <= line.y+10)) {
+                            continueChecking = false
+                            pointedPosition = line
+                            setPointedIndexs(false)
+                            showTimePosition(x_pos, y_pos)
+                            drawPointedPosition(pointedPosition.x, pointedPosition.y, 3)
+                        }
+                    })
+                    j++
+                }
+            }
+        }
+    }
+    function checkLine(x_pos, y_pos, line) {
+        if((x_pos >= line.x-10 && x_pos <= line.x+10)&&(y_pos >= line.y-10 && y_pos <= line.y+10)) {
+            console.log('coba')
+            return line
+        } else {
+            return {}
+        }
+    }
+    function setPointedIndexs(isBall) {
+        pointedT = parseFloat((pointedPosition.t / 1000)).toFixed(2)
+        pointedX = isBall ? parseFloat(((pointedPosition.x / 2 - 14)/10)).toFixed(2) : parseFloat(((pointedPosition.x / 2 - 14)/10)).toFixed(2)
+        pointedY = pointedPosition.y == movingObjectY0 ? 0.00 : parseFloat(((movingObjectY0 - pointedPosition.y)/20)-0.04).toFixed(2)
+        timeIndex.value = pointedT
+        rangeIndex.value = pointedX
+        heightIndex.value = pointedY
+    }
+    function saveLinesHistories() {
+        if(linesPositionHistories.length > 0) {
+            linesPositionHistories[linesPositionHistories.length] = []
+            linesPositionHistories[linesPositionHistories.length-1] = linesCoordinates
+        } else {
+            linesPositionHistories = []
+            linesPositionHistories.push(linesCoordinates)
+        }
+    }
+    function saveFurthestX(x_pos) {
+        furthestX = x_pos > furthestX ? x_pos : furthestX
+    }
+    function clearCanvas() {
+        closeTimePosition()
+        lastBallPosition = []
+        linesPositionHistories = []
+        ctxPointedPosition.clearRect(0,0,canvasWidth,canvasHeight)
+        ctxIdleBall.clearRect(0,0,canvasWidth,canvasHeight)
+        ctxMovingLine.clearRect(0,0,canvasWidth,canvasHeight)
+        drawIdleBall(movingObjectX0, movingObjectY0)
+    }
+    
+    
+</script>
+</html>

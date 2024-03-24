@@ -1,0 +1,523 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+:root {
+    /* --deck-width: 560px; */
+    --deck-width: 420px;
+    /* --deck-height: 110px; */
+    --deck-height: 82.5px;
+    --card-width: calc(var(--deck-width) / 7 * 1);
+    --card-gap: 6px;
+    --card-1-multiple: 0;
+    --card-2-multiple: 1;
+    --card-3-multiple: 2;
+    --card-4-multiple: 3;
+    --card-5-multiple: 4;
+    --card-6-multiple: 5;
+    --card-7-multiple: 6;
+}
+@font-face {
+    font-family: montserrat;
+    src: url('../fonts/Montserrat/static/Montserrat-Regular.ttf');
+}
+@font-face {
+    font-family: poppins;
+    src: url('../fonts/Poppins/Poppins-Regular.ttf');
+}
+html, body {
+    height: 100%;
+}
+body {
+    background-color: #155843;
+    box-shadow: inset 5px 5px 100px 10px #0a2b21;
+}
+button {
+    cursor: pointer;
+}
+#app {
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
+    overflow-x: hidden;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.container {
+    width: calc(var(--deck-width) * 2);
+    height: fit-content;
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 40px;
+    row-gap: 20px;
+}
+header {
+    width: 100%;
+}
+/* SIDEBAR START */
+aside {
+    /* margin-top: .5rem; */
+}
+#gameTitle {
+    font-family: 'Times New Roman', Times, serif;
+    color: white;
+    font-size: 60px;
+}
+.subtitle {
+    font-size: 24px;
+    font-family: montserrat;
+    font-weight: 100;
+    color: #f8f9fa;
+}
+#tutorial {
+    /* width: 120%; */
+    width: 300px;
+    height: calc(var(--deck-height) * 3);
+    padding: 1rem;
+    margin-top: 1rem;
+    border-radius: .5rem;
+    background-color: #212529a9;
+    color: white;
+    box-sizing: border-box;
+    overflow: hidden;
+    display: flex;
+    flex-wrap: wrap;
+}
+#tutorial p {
+    line-height: 20px;
+    font-size: 14px;
+}
+#tutorial .footer, #tutorial .header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#tutorial .footer {
+    align-self: flex-end;
+}
+#tutorial .header .close {
+    font-family: sans-serif;
+    font-size: 12px;
+    color: white;
+}
+#startBtn {
+    border: none;
+    display: block;
+    margin-top: 2rem;
+    width: 100%;
+    padding: .6rem 0rem;
+    border-radius: .2rem;
+    box-sizing: border-box;
+    background-image: linear-gradient(orangered, orange);
+    color: rgb(37, 38, 112);
+    font-weight: bold;
+    transition: all 200ms ease-in-out;
+
+}
+#startBtn.visible {
+    animation-name: look;
+    animation-timing-function: ease;
+    animation-duration: 600ms;
+    animation-fill-mode: none;
+}
+#startBtn.visible:hover {
+    transition: all 200ms ease-in-out;
+    opacity: .8;
+}
+#startBtn.hidden {
+    transition: all 600ms ease;
+    opacity: 0;
+}
+#startBtn.vanish {
+    opacity: 0;
+}
+/* SIDEBAR END */
+
+/* HEADER START */
+
+
+/* HEADER END */
+
+/* ALERTS START  */
+#alerts {
+    width: var(--deck-width);
+    position: relative;
+    z-index: 7;
+    margin-top: calc(var(--deck-height) / 4);
+    /* margin-bottom: calc(var(--deck-height) / 4 * 3 * -1); */
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+.instruction-cards {
+    width: 100%;
+    position: relative;
+    overflow-y: hidden;
+}
+.instruction-card {
+    width: 100%;
+    padding: .5rem 1rem;
+    border-radius: .2rem;
+    background-color: blue;
+    border: 1px solid black;
+    box-sizing: border-box;
+}
+.instruction-card:first-child {
+    top: 200px;
+}
+
+#confirmation, #message {
+    width: var(--deck-width);
+    position: absolute;
+    padding: .9rem 1rem;
+    box-sizing: border-box;
+    background-color: yellow;
+    border-radius: 4px;
+    font-family: serif;
+    font-size: .8rem;
+    opacity: 0;
+    top: calc(var(--deck-height) * -0.5);
+}
+#confirmation.visible, #message.visible {
+    /* transition: all 600ms ease;
+    opacity: 1; */
+    animation-name: look;
+    animation-timing-function: ease;
+    animation-duration: 600ms;
+    animation-fill-mode: forwards;
+}
+#confirmation.hidden, #message.hidden {
+    animation-name: stealth;
+    animation-timing-function: ease;
+    animation-duration: 600ms;
+    animation-fill-mode: forwards;
+    /* display: none; */
+}
+#confirmation.vanish, #message.vanish {
+    display: none;
+}
+@keyframes look {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+@keyframes stealth {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+/* #confirmation::after, #message::after {
+    content: ' ';
+    width: 20px;
+    height: 20px;
+    position: absolute;
+    bottom: 0;
+    background-color: yellow;
+    display: block;
+    transform:  translateY(50%) rotate(-45deg);
+} */
+
+#message {
+    position: absolute;
+}
+#alerts .box-sm {
+    width: calc(var(--card-width) * 2);
+    text-align: center;
+}
+#alerts .box-lg {
+    width: var(--deck-width);
+}
+#confirmation.box-sm::after, #message.box-sm::after {
+    left: 50%;
+    transform: translateX(-50%) translateY(50%) rotate(-45deg);
+}
+#yesBtn, #noBtn, #gotItBtn {
+    background-color: transparent;
+    border: none;
+    font-weight: bold;
+}
+#yesBtn {
+    color: rgba(65, 105, 225, 1);
+}
+#noBtn {
+    color: rgba(255, 0, 0, 1);
+}
+#gotItBtn {
+    margin-top: 10px;
+    padding: 0;
+    color: limegreen;
+    float: right;
+}
+
+/* DECK & CARD */
+main {
+    
+}
+#title {
+    text-align: center;
+    color: white;
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-weight: bolder;
+    font-size: 40px;
+    letter-spacing:6px;
+    padding-top: 5rem;
+    text-transform: uppercase;
+    opacity: 0.9;
+}
+
+#decksContainer {
+    width: var(--deck-width);
+    height: calc(var(--deck-height) * 3);
+    position: relative;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+#decksContainer .deck {
+    width: 100%;
+    height: calc(100% / 3 * 1 - var(--card-gap));
+    position: absolute;
+    margin-bottom: 7px; /* UBAH NILAINYA MENGGUNAKAN VARIABLE */
+    display: flex;
+    flex-wrap: wrap;
+    transition: all 600ms ease;
+    z-index: 4;
+}
+#decksContainer .deck:nth-child(1) {
+    transform: translateY(0%);
+}
+#decksContainer .deck:nth-child(2) {
+    transform: translateY(calc(var(--deck-height) + var(--card-gap) / 2));
+}
+#decksContainer .deck:nth-child(3) {
+    transform: translateY(calc(var(--deck-height) * 2 + var(--card-gap)));
+}
+#decksContainer .deck .card {
+    width: calc(100% / 7 * 1 - var(--card-gap));
+    height: 100%;
+    position: absolute;
+    box-sizing: border-box;
+    
+    text-align: center;
+    transform-style: preserve-3d;
+    transition: all 600ms ease;
+}
+#decksContainer .deck .card .front-face,
+#decksContainer .deck .card .back-face {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    backface-visibility: hidden;
+}
+#decksContainer .deck .card .front-face {
+    background-image: url("../images/cards/card_back.png");
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+}
+#decksContainer .deck .card .back-face {
+    transform: rotateY(180deg);
+}
+#decksContainer > .deck > .card > .back-face > img {
+    width: fit-content;
+    height: 100%;
+    object-fit: cover;
+}
+/* DECK & CARD : CARD POSITIONING */
+#decksContainer .deck .card:nth-child(1) {
+    transform: translateX(calc(100%*var(--card-1-multiple) + var(--card-gap)*var(--card-1-multiple)));
+}
+#decksContainer .deck .card:nth-child(2) {
+    transform: translateX(calc(100%*var(--card-2-multiple) + var(--card-gap)*var(--card-2-multiple) + 1px * var(--card-2-multiple)));
+}
+#decksContainer .deck .card:nth-child(3) {
+    transform: translateX(calc(100%*var(--card-3-multiple) + var(--card-gap)*var(--card-3-multiple) + 1px * var(--card-3-multiple)));
+}
+#decksContainer .deck .card:nth-child(4) {
+    transform: translateX(calc(100%*var(--card-4-multiple) + var(--card-gap)*var(--card-4-multiple) + 1px * var(--card-4-multiple)));
+}
+#decksContainer .deck .card:nth-child(5) {
+    transform: translateX(calc(100%*var(--card-5-multiple) + var(--card-gap)*var(--card-5-multiple) + 1px * var(--card-5-multiple)));
+}
+#decksContainer .deck .card:nth-child(6) {
+    transform: translateX(calc(100%*var(--card-6-multiple) + var(--card-gap)*var(--card-6-multiple) + 1px * var(--card-6-multiple)));
+}
+#decksContainer .deck .card:nth-child(7) {
+    transform: translateX(calc(100%*var(--card-7-multiple) + var(--card-gap)*var(--card-7-multiple) + 1px * var(--card-7-multiple)));
+}
+/* DECK & CARD END */
+
+/* FOOTER START */
+footer {
+    padding-bottom: 5rem;
+    background-color: black;
+    color: white;
+}
+footer button, footer div {
+    display: inline-block;
+}
+footer button {
+    cursor: pointer;
+}
+/* FOOTER END */
+
+/* ANIMATIONS START */
+/* animation : collapse START*/
+#decksContainer.collapseAble .deck.collapse .card:nth-child(1),
+#decksContainer.collapseAble .deck.collapse .card:nth-child(2),
+#decksContainer.collapseAble .deck.collapse .card:nth-child(3),
+#decksContainer.collapseAble .deck.collapse .card:nth-child(5),
+#decksContainer.collapseAble .deck.collapse .card:nth-child(6),
+#decksContainer.collapseAble .deck.collapse .card:nth-child(7)  {
+    transform: translateX(calc(100%*var(--card-4-multiple) + var(--card-gap)*var(--card-4-multiple) + 1px * var(--card-4-multiple)));
+}
+/* animation : collapse END */
+
+/* animation : down START*/
+#decksContainer.downAble .deck.down {
+    transform: translateY(calc(var(--deck-height) * 2 + var(--card-gap)));
+}
+/* animation : down END */
+
+/* animation : spread START */
+#decksContainer.spreadAble .spread:nth-child(1) {
+    transform:  translateX(calc(var(--card-width) * -2)) translateY(calc(var(--deck-height) * 2 + var(--card-gap)));
+}
+#decksContainer.spreadAble .spread:nth-child(2) {
+    transform:  translateY( calc(var(--deck-height) * 2 + var(--card-gap)));
+}
+#decksContainer.spreadAble .spread:nth-child(3) {
+    transform:  translateX(calc(var(--card-width) * 2)) translateY(calc(var(--deck-height) * 2 + var(--card-gap)));
+}
+/* animation : spread END */
+
+/* animation : open START */
+#decksContainer.openAble .deck.forward {
+    transform: translateY(calc(var(--deck-height) - var(--deck-height) / 2));
+}
+/* animation : open END */
+
+/* animation : flip START */
+#decksContainer .deck.flipable .card.flip:nth-child(1) {
+    transform: rotateY(180deg) translateX(calc(0%));
+}
+#decksContainer .deck.flipable .card.flip:nth-child(2) {
+    transform: rotateY(180deg) translateX(calc(-100% - 7px));
+    /* transform: matrix(1, 0, 0, 1, ) */
+}
+#decksContainer .deck.flipable .card.flip:nth-child(3) {
+    transform: rotateY(180deg) translateX(calc(-100% * 2 - 7px * 2));
+}
+#decksContainer .deck.flipable .card.flip:nth-child(4) {
+    transform: rotateY(180deg) translateX(calc(-100% * 3 - 7px * 3));
+}
+#decksContainer .deck.flipable .card.flip:nth-child(5) {
+    transform: rotateY(180deg) translateX(calc(-100% * 4 - 7px * 4));
+}
+#decksContainer .deck.flipable .card.flip:nth-child(6) {
+    transform: rotateY(180deg) translateX(calc(-100% * 5 - 7px * 5));
+}
+#decksContainer .deck.flipable .card.flip:nth-child(7) {
+    transform: rotateY(180deg) translateX(calc(-100% * 6 - 7px * 6));
+}
+/* animation : flip END */
+
+/* animation : show answer START */
+#decksContainer .deck.answer-deck .card.answer-card {
+    transform: translateY(calc(var(--deck-height) - var(--deck-height) * 5 / 2 - var(--card-gap))) translateX(calc(100%*var(--card-4-multiple) + var(--card-gap)*var(--card-4-multiple) + 1px * var(--card-4-multiple)));
+}
+#decksContainer .deck.answer-deck .card.answer-card.flip {
+    transform: translateY(calc(var(--deck-height) - var(--deck-height) * 5 / 2 - var(--card-gap))) rotateY(180deg) translateX(calc(-100% * 3 - 7px * 3));
+}
+/* animation : show answer END */
+
+/* animation : shuffle START */
+#decksContainer.shuffleAble .deck.shuffle {
+    animation-name: shuffle;
+    animation-duration: 900ms;
+    animation-timing-function: ease-in-out;
+    animation-fill-mode: forwards;
+}
+/* animation : shuffle END */
+
+/* ANIMATIONS END */
+
+/* KEYFRAMES START */
+@keyframes shuffle {
+    0% {
+        transform: translateY(calc(var(--deck-height) * 2 + var(--card-gap))) translateX(0%);
+        z-index: 5;
+    }
+    33% {
+        transform: translateY(50%) translateX(0%) rotate(-15deg) scale(.9);
+        z-index: 5;
+    }
+    90% {
+        z-index: 0;
+        transform: translateY(calc(var(--deck-height) * 2 + var(--card-gap))) translateX(0%) rotate(0deg) scale(1);
+    }
+    100% {
+        z-index: 0;
+        transform: translateY(calc(var(--deck-height) * 2 + var(--card-gap))) translateX(0%) rotate(0deg) scale(1);
+    }
+}
+@media (max-width: 992px) {
+    #title {
+        margin-top: 20%;
+    }
+}
+@media (max-width: 512px) {
+    :root {
+        --deck-width: 350px;
+        --deck-height: 70px;
+    }
+    #title {
+        font-size: 26px;
+        letter-spacing: 4px;
+    }
+    #decksContainer {
+        transform: translateY(30%);
+    }
+    #startBtn {
+        width: var(--deck-width);
+        margin-top: 7rem;
+    }
+}
+@media (max-width: 360px) {
+    :root {
+        --deck-width: 266px;
+        --deck-height: 60px;
+    }
+    #alerts .box-sm {
+        width: calc(var(--card-width) * 4);
+    }
+    #alerts .box-lg {
+        width: var(--deck-width);
+    }
+    #decksContainer .deck .card .front-face,
+    #decksContainer .deck .card .back-face {
+        border-radius: 6px;
+    }
+    #startBtn {
+        margin-top: 7rem;
+    }
+}
+.share {
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 14px;
+    color: white;
+    margin-top: 2rem;
+}
